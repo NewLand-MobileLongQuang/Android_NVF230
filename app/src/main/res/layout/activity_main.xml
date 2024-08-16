@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="10dp">
+
+        <Button
+            android:id="@+id/bnOpenDevice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/TextOpen" />
+
+        <Spinner
+            android:id="@+id/spCommtype"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:entries="@array/comm_type" />
+
+        <Button
+            android:id="@+id/bnScanEnable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/EnableRead" />
+
+        <Button
+            android:id="@+id/bnRestartDevice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/TextRestart" />
+
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="10dp">
+
+        <Button
+            android:id="@+id/bnScanBarcode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/TextDecode" />
+
+        <Button
+            android:id="@+id/bnClearResult"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/TextClear" />
+
+        <Button
+            android:id="@+id/bnGetDeviceInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/TextGetInfo" />
+
+        <Button
+            android:id="@+id/bnSenseMode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/TextSenseMode" />
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="10dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/TextSerialName" />
+
+        <EditText
+            android:id="@+id/editSerialname"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:drawable/edit_text"
+            android:text="/dev/ttyMT1"
+            android:singleLine="true"
+            tools:ignore="LabelFor" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/TextSerailBaud" />
+
+        <EditText
+            android:id="@+id/editBaud"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:drawable/edit_text"
+            android:digits="0123456789"
+            android:text="9600"
+            android:inputType="number"
+            android:singleLine="true"
+            tools:ignore="LabelFor" />
+    </TableRow>
+
+
+
+
+
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:text="@string/TextUnityCommand" />
+
+        <EditText
+            android:id="@+id/editConfig"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_weight="1"
+            android:autofillHints="@string/TextQueryCommand"
+            android:background="@android:drawable/edit_text"
+            android:gravity="top"
+            android:inputType="text"
+            android:overScrollMode="always"
+            android:scrollbars="vertical"
+            android:singleLine="false"
+            tools:ignore="LabelFor" />
+
+        <Button
+            android:id="@+id/bnQueCfg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/TextGetCfg" />
+
+        <Button
+            android:id="@+id/bnGetImg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/TextGetImg" />
+
+    </TableRow>
+
+    <EditText
+        android:id="@+id/etResult"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_weight="1"
+        android:background="@android:drawable/edit_text"
+        android:gravity="top"
+        android:overScrollMode="always"
+        android:scrollbars="vertical"
+        android:singleLine="false" />
+
+    <TableRow
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp">
+
+        <TextView
+            android:id="@+id/txtFilePath"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_weight="1"
+            android:autofillHints="@string/SelectFile"
+            android:background="@android:drawable/edit_text"
+            android:gravity="top"
+            android:inputType="text"
+            android:scrollbars="vertical"
+            android:singleLine="false"
+            tools:ignore="LabelFor" />
+
+        <Button
+            android:id="@+id/bnUpdateFirmware"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/TextUpdate" />
+        <Button
+            android:id="@+id/bnUpdateConfig"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/TextUpdateConfig" />
+    </TableRow>
+    <ProgressBar
+        android:id="@+id/pbUpdate"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:progress="0" />
+</TableLayout>
