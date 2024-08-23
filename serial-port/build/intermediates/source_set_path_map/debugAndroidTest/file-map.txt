@@ -1,0 +1,5 @@
+com.aill.androidserialport.test.serial-port-androidTest-0 /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/build/generated/res/resValues/androidTest/debug
+com.aill.androidserialport.test.serial-port-mergeDebugAndroidTestResources-1 /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/build/intermediates/incremental/debugAndroidTest/mergeDebugAndroidTestResources/merged.dir
+com.aill.androidserialport.test.serial-port-mergeDebugAndroidTestResources-2 /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/build/intermediates/incremental/debugAndroidTest/mergeDebugAndroidTestResources/stripped.dir
+com.aill.androidserialport.test.serial-port-merged_res-3 /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/build/intermediates/merged_res/debugAndroidTest
+com.aill.androidserialport.test.serial-port-packaged_res-4 /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/build/intermediates/packaged_res/debug

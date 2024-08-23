@@ -1,15 +1,21 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.2"
+    namespace "com.aill.androidserialport"
+    compileSdkVersion 34
 
     defaultConfig {
-        minSdkVersion 17
-        targetSdkVersion 29
+        minSdkVersion 21
+        targetSdkVersion 34
 
         ndk {
             moduleName "serial_port"
+        }
+
+        sourceSets {
+            main {
+                jniLibs.srcDirs = ['/src/main/jniLibs'] // 假设你的.so文件在项目的libs目录下
+            }
         }
     }
 

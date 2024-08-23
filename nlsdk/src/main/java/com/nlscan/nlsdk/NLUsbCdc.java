@@ -1,6 +1,7 @@
 package com.nlscan.nlsdk;
 
 import android.content.Context;
+
 import java.nio.ByteBuffer;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -14,15 +15,16 @@ class NLUsbCdc extends NLUSBStream {
     private NLDeviceStream.NLUsbListener usbListener;
     private Timer readTimer = null;
     private TimerTask timerTask;
-    private byte[] codeBuffer = new byte [4096];
+    private byte[] codeBuffer = new byte[4096];
     private int coderPos = 0;
     private BlockingQueue<ByteBuffer> coderPacketQ;
     private int PACKET_Q_SIZE = 64;             // 64 * 64 = 4096
+
     @Override
     public boolean open(Context context) {
         final byte[] usbClass = {0x06};   //
-      return super.openCtx(context, usbClass);
-  }
+        return super.openCtx(context, usbClass);
+    }
 
     @Override
     public boolean open(String pathName, int baudrate) {
@@ -34,7 +36,7 @@ class NLUsbCdc extends NLUSBStream {
         usbListener = listener;
         coderPacketQ = new ArrayBlockingQueue<>(PACKET_Q_SIZE);
 
-        if(readTimer != null) {
+        if (readTimer != null) {
             readTimer.cancel();
             readTimer = null;
             timerTask = null;
@@ -59,7 +61,7 @@ class NLUsbCdc extends NLUSBStream {
                         int entry = PACKET_Q_SIZE - coderPacketQ.remainingCapacity();
                         ByteBuffer byteBuffer;
                         coderPos = 0;
-                        for(int i=0; i<entry; i++) {
+                        for (int i = 0; i < entry; i++) {
                             try {
                                 byteBuffer = coderPacketQ.take();
                                 int packageSize = 64;
@@ -75,7 +77,7 @@ class NLUsbCdc extends NLUSBStream {
                             }
 
                         }
-                        if(coderPos > 0)
+                        if (coderPos > 0)
                             usbListener.actionUsbRecv(codeBuffer, coderPos);
                     }
                 };
@@ -96,7 +98,7 @@ class NLUsbCdc extends NLUSBStream {
         return bytes == len;
     }
 
-    public int  readPacket(byte[] dst, int pos, int length, int timeout) {
+    public int readPacket(byte[] dst, int pos, int length, int timeout) {
         byte[] buffer = new byte[length];
 
         int len = super.read(buffer, length, timeout);

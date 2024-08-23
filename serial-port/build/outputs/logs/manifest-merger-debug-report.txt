@@ -1,25 +1,25 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /Users/leson/Documents/luc_idocnet/idocnet_apps/Thiết bị mới/1-Android SDK_ScanTool/ScanTool/serial-port/src/main/AndroidManifest.xml:1:1-2:40
-INJECTED from /Users/leson/Documents/luc_idocnet/idocnet_apps/Thiết bị mới/1-Android SDK_ScanTool/ScanTool/serial-port/src/main/AndroidManifest.xml:1:1-2:40
-INJECTED from /Users/leson/Documents/luc_idocnet/idocnet_apps/Thiết bị mới/1-Android SDK_ScanTool/ScanTool/serial-port/src/main/AndroidManifest.xml:1:1-2:40
+ADDED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml:1:1-72
+INJECTED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml:1:1-72
+INJECTED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml:1:1-72
 	package
-		ADDED from /Users/leson/Documents/luc_idocnet/idocnet_apps/Thiết bị mới/1-Android SDK_ScanTool/ScanTool/serial-port/src/main/AndroidManifest.xml:2:5-37
-		INJECTED from /Users/leson/Documents/luc_idocnet/idocnet_apps/Thiết bị mới/1-Android SDK_ScanTool/ScanTool/serial-port/src/main/AndroidManifest.xml
-		INJECTED from /Users/leson/Documents/luc_idocnet/idocnet_apps/Thiết bị mới/1-Android SDK_ScanTool/ScanTool/serial-port/src/main/AndroidManifest.xml
+		INJECTED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml
+		ADDED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml:1:1-72
+		INJECTED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml
 	xmlns:android
-		ADDED from /Users/leson/Documents/luc_idocnet/idocnet_apps/Thiết bị mới/1-Android SDK_ScanTool/ScanTool/serial-port/src/main/AndroidManifest.xml:1:11-69
+		ADDED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml:1:11-69
 uses-sdk
-INJECTED from /Users/leson/Documents/luc_idocnet/idocnet_apps/Thiết bị mới/1-Android SDK_ScanTool/ScanTool/serial-port/src/main/AndroidManifest.xml reason: use-sdk injection requested
-INJECTED from /Users/leson/Documents/luc_idocnet/idocnet_apps/Thiết bị mới/1-Android SDK_ScanTool/ScanTool/serial-port/src/main/AndroidManifest.xml
-INJECTED from /Users/leson/Documents/luc_idocnet/idocnet_apps/Thiết bị mới/1-Android SDK_ScanTool/ScanTool/serial-port/src/main/AndroidManifest.xml
-INJECTED from /Users/leson/Documents/luc_idocnet/idocnet_apps/Thiết bị mới/1-Android SDK_ScanTool/ScanTool/serial-port/src/main/AndroidManifest.xml
-INJECTED from /Users/leson/Documents/luc_idocnet/idocnet_apps/Thiết bị mới/1-Android SDK_ScanTool/ScanTool/serial-port/src/main/AndroidManifest.xml
+INJECTED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml
+INJECTED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml
+INJECTED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml
+INJECTED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml
 	android:targetSdkVersion
-		INJECTED from /Users/leson/Documents/luc_idocnet/idocnet_apps/Thiết bị mới/1-Android SDK_ScanTool/ScanTool/serial-port/src/main/AndroidManifest.xml
-		ADDED from /Users/leson/Documents/luc_idocnet/idocnet_apps/Thiết bị mới/1-Android SDK_ScanTool/ScanTool/serial-port/src/main/AndroidManifest.xml
-		INJECTED from /Users/leson/Documents/luc_idocnet/idocnet_apps/Thiết bị mới/1-Android SDK_ScanTool/ScanTool/serial-port/src/main/AndroidManifest.xml
+		INJECTED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml
+		ADDED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml
+		INJECTED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml
 	android:minSdkVersion
-		INJECTED from /Users/leson/Documents/luc_idocnet/idocnet_apps/Thiết bị mới/1-Android SDK_ScanTool/ScanTool/serial-port/src/main/AndroidManifest.xml
-		ADDED from /Users/leson/Documents/luc_idocnet/idocnet_apps/Thiết bị mới/1-Android SDK_ScanTool/ScanTool/serial-port/src/main/AndroidManifest.xml
-		INJECTED from /Users/leson/Documents/luc_idocnet/idocnet_apps/Thiết bị mới/1-Android SDK_ScanTool/ScanTool/serial-port/src/main/AndroidManifest.xml
+		INJECTED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml
+		ADDED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml
+		INJECTED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml

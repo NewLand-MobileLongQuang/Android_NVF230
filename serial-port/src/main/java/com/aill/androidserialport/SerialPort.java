@@ -1,17 +1,17 @@
 /*
  * Copyright 2009 Cedric Priscal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  */
 
 package com.aill.androidserialport;
@@ -28,44 +28,46 @@ import android.util.Log;
 
 public class SerialPort {
 
-	private static final String TAG = "SerialPort";
+    private static final String TAG = "SerialPort";
 
-	/*
-	 * Do not remove or rename the field mFd: it is used by native method close();
-	 */
-	private FileDescriptor mFd;
-	private FileInputStream mFileInputStream;
-	private FileOutputStream mFileOutputStream;
+    /*
+     * Do not remove or rename the field mFd: it is used by native method close();
+     */
+    private FileDescriptor mFd;
+    private FileInputStream mFileInputStream;
+    private FileOutputStream mFileOutputStream;
 
-	public SerialPort(File device, int baudrate, int flags) throws SecurityException, IOException {
+    public SerialPort(File device, int baudrate, int flags) throws SecurityException, IOException {
 
-		/* Check access permission */
-		if (!device.canRead() || !device.canWrite()) {
-			throw new IOException();
-		}
+        /* Check access permission */
+        if (!device.canRead() || !device.canWrite()) {
+            throw new IOException();
+        }
 
-		mFd = open(device.getAbsolutePath(), baudrate, flags);
-		if (mFd == null) {
-			Log.e(TAG, "native open returns null");
-			throw new IOException();
-		}
-		mFileInputStream = new FileInputStream(mFd);
-		mFileOutputStream = new FileOutputStream(mFd);
-	}
+        mFd = open(device.getAbsolutePath(), baudrate, flags);
+        if (mFd == null) {
+            Log.e(TAG, "native open returns null");
+            throw new IOException();
+        }
+        mFileInputStream = new FileInputStream(mFd);
+        mFileOutputStream = new FileOutputStream(mFd);
+    }
 
-	// Getters and setters
-	public InputStream getInputStream() {
-		return mFileInputStream;
-	}
+    // Getters and setters
+    public InputStream getInputStream() {
+        return mFileInputStream;
+    }
 
-	public OutputStream getOutputStream() {
-		return mFileOutputStream;
-	}
+    public OutputStream getOutputStream() {
+        return mFileOutputStream;
+    }
 
-	// JNI
-	private native static FileDescriptor open(String path, int baudrate, int flags);
-	public native void close();
-	static {
-		System.loadLibrary("serial_port");
-	}
+    // JNI
+    private native static FileDescriptor open(String path, int baudrate, int flags);
+
+    public native void close();
+
+    static {
+        System.loadLibrary("serial_port");
+    }
 }

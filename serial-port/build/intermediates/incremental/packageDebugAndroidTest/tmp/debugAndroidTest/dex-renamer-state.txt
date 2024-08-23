@@ -1,0 +1,7 @@
+#Thu Aug 22 10:40:21 ICT 2024
+base.0=/Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/build/intermediates/dex/debugAndroidTest/mergeLibDexDebugAndroidTest/0/classes.dex
+base.1=/Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/build/intermediates/dex/debugAndroidTest/mergeProjectDexDebugAndroidTest/0/classes.dex
+path.0=0/classes.dex
+path.1=0/classes.dex
+renamed.0=classes.dex
+renamed.1=classes2.dex

@@ -11,16 +11,16 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 /**
- *  Here, the USB Composite (composite device of KBW and POS) is encapsulated.
- *  The operation here is only encapsulated for the POS read and write interface,
- *  and the method of encapsulation and unpacking is the same as that of USB POS.
+ * Here, the USB Composite (composite device of KBW and POS) is encapsulated.
+ * The operation here is only encapsulated for the POS read and write interface,
+ * and the method of encapsulation and unpacking is the same as that of USB POS.
  */
 class NLUsbComposite extends NLUSBStream {
     private NLDeviceStream.NLUsbListener usbListener;
-    private boolean             hasChangeInterface;
+    private boolean hasChangeInterface;
     private Timer readTimer = null;
     private TimerTask timerTask;
-    private byte[] codeBuffer = new byte [4096];
+    private byte[] codeBuffer = new byte[4096];
     private int coderPos = 0;
     private BlockingQueue<ByteBuffer> coderPacketQ;
     private int PACKET_Q_SIZE = 64;             // 64 * 64 = 4096
@@ -29,7 +29,7 @@ class NLUsbComposite extends NLUSBStream {
     public boolean open(Context context) {
         final byte[] usbClass = {0x22};   //
 
-        if(!super.openCtx(context, usbClass))
+        if (!super.openCtx(context, usbClass))
             return false;
 
         hasChangeInterface = hidChangeInterface(true);
@@ -46,25 +46,26 @@ class NLUsbComposite extends NLUSBStream {
     public boolean open(String pathName, int baudrate) {
         return false;
     }
- @Override
-    public void close(Context context)
-    {
+
+    @Override
+    public void close(Context context) {
         hasChangeInterface = hidChangeInterface(false);
         if (!hasChangeInterface) {
             Log.e(TAG, "Switch false problem");
-       }
-       super.close(context);
+        }
+        super.close(context);
     }
 
     /**
-    /**
+     * /**
      * Write NL definition POS protocol package
-     A brief description is as follows,
-     and the detailed agreement format can be found in the relevant documents of the company
+     * A brief description is as follows,
+     * and the detailed agreement format can be found in the relevant documents of the company
      * -------------------------------------
      * | byte0       byte1  ...  byte63    |
      * | pos protocol header   length       end package flag |
-     *  -----------------------------------
+     * -----------------------------------
+     *
      * @param src write content
      * @param pos buffer offset
      * @param len content length
@@ -84,24 +85,24 @@ class NLUsbComposite extends NLUSBStream {
                 pos += maxSendLen;
                 len -= maxSendLen;
             } else {
-                buffer[1] = (byte)len;
+                buffer[1] = (byte) len;
                 System.arraycopy(src, pos, buffer, 2, len);
-                Arrays.fill(buffer, 2 + len, packageSize, (byte)0);
+                Arrays.fill(buffer, 2 + len, packageSize, (byte) 0);
                 pos += len;
                 len -= len;
             }
-            int bytes = write(buffer,  packageSize, 3000);
+            int bytes = write(buffer, packageSize, 3000);
             if (bytes != packageSize) return false;
         }
         return true;
- }
-	
+    }
+
     @Override
     public void setUsbListener(NLDeviceStream.NLUsbListener listener) {
         usbListener = listener;
         coderPacketQ = new ArrayBlockingQueue<>(PACKET_Q_SIZE);
 
-        if(readTimer != null) {
+        if (readTimer != null) {
             readTimer.cancel();
             readTimer = null;
             timerTask = null;
@@ -126,7 +127,7 @@ class NLUsbComposite extends NLUSBStream {
                         int entry = PACKET_Q_SIZE - coderPacketQ.remainingCapacity();
                         ByteBuffer byteBuffer;
                         coderPos = 0;
-                        for(int i=0; i<entry; i++) {
+                        for (int i = 0; i < entry; i++) {
                             try {
                                 byteBuffer = coderPacketQ.take();
                                 int packageSize = 64;
@@ -142,7 +143,7 @@ class NLUsbComposite extends NLUSBStream {
                             }
 
                         }
-                        if(coderPos > 0)
+                        if (coderPos > 0)
                             usbListener.actionUsbRecv(codeBuffer, coderPos);
                     }
                 };
@@ -151,26 +152,27 @@ class NLUsbComposite extends NLUSBStream {
         });
     }
 
-   
+
     /**
      * Read the POS protocol package defined by NL, the brief description is as follows,
      * and the detailed protocol format can be found in the company's relevant documents
      * -------------------------------------
      * | byte0       byte1  ...  byte63    |
      * | pos protocol header   length        end package flag |
-     *  -----------------------------------
-     * @param dst receive response buffer
-     * @param pos  buffer offset
-     * @param length   receive buffer length
-     * @param timeout  Single packet receive timeout
+     * -----------------------------------
+     *
+     * @param dst     receive response buffer
+     * @param pos     buffer offset
+     * @param length  receive buffer length
+     * @param timeout Single packet receive timeout
      * @return Receive data length (greater than 0), return a negative value if an error occurs
      */
-    public int  readPacket(byte[] dst, int pos, int length, int timeout) {
+    public int readPacket(byte[] dst, int pos, int length, int timeout) {
         int packageSize = 64;
         byte[] buffer = new byte[packageSize];
 
         int ret = super.read(buffer, packageSize, timeout);
-        if (ret < 0)   return ret;
+        if (ret < 0) return ret;
         if (ret != packageSize || buffer[0] != 2) return 0;
         int len = buffer[1] & 0xFF;
         if (len > packageSize - 2) return 0;

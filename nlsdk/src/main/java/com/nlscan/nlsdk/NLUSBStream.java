@@ -29,7 +29,7 @@ import android.os.Process;
  * If the VID and PID are customized, please modify the relevant code.
  */
 abstract class NLUSBStream implements NLCommStream{
-	private UsbDeviceConnection connection;
+    private UsbDeviceConnection connection;
     private UsbInterface        dataInterface;
     private UsbEndpoint         readEndpoint;
     private UsbEndpoint         writeEndpoint;
@@ -75,13 +75,18 @@ abstract class NLUSBStream implements NLCommStream{
     boolean openCtx(Context context, byte[] usbClass){
         if (isOpen())
             return false;
-
         usbManager = (UsbManager)context.getSystemService(Context.USB_SERVICE);
         IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
         filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
         filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
         context.registerReceiver(mUsbPermissionActionReceiver, filter);
-        PendingIntent mPermissionIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), 0);
+//        PendingIntent mPermissionIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), 0);
+        PendingIntent mPermissionIntent;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            mPermissionIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_MUTABLE);
+        } else {
+            mPermissionIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), 0);
+        }
 
         if(usbManager == null) {
             Log.e(TAG, "Don't support USB service.");
@@ -148,45 +153,40 @@ abstract class NLUSBStream implements NLCommStream{
             public  void run() {
                 Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_AUDIO);
                 while(true){
-                    synchronized (lock) {
-                        if (mStop) {
-                            return;
-                        }
+                    try {
+                        synchronized (lock) {
+                            if (mStop) {
+                                return;
+                            }
 
-                        ByteBuffer byteBuffer = ByteBuffer.allocate(inMax);
-                        try{
-                            if(Build.VERSION.SDK_INT >= 26)
+                            ByteBuffer byteBuffer = ByteBuffer.allocate(inMax);
+                            if (Build.VERSION.SDK_INT >= 26)
                                 usbRequest.queue(byteBuffer);
                             else
                                 usbRequest.queue(byteBuffer, inMax);
-                        }catch (IllegalStateException e){
-                            e.printStackTrace();
-                        }
-//                        if(Build.VERSION.SDK_INT >= 26)
-//                            usbRequest.queue(byteBuffer);
-//                        else
-//                            usbRequest.queue(byteBuffer, inMax);
-                        if (connection.requestWait() == usbRequest) {
-                            int recvLen = byteBuffer.position();
-                            if(isAck) {
-                                Log.i(TAG, "dt:"+recvLen);
-                                if (recvLen > 0){
-                                    usbListener.actionUsbRecv(byteBuffer);
+                            if (connection.requestWait() == usbRequest) {
+                                int recvLen = byteBuffer.position();
+                                if (isAck) {
+//                                Log.i(TAG, "dt:"+recvLen);
+                                    if (recvLen > 0) {
+                                        usbListener.actionUsbRecv(byteBuffer);
+                                    }
+                                } else {
+                                    try {
+//                                    Log.i(TAG, "rv:"+recvLen);
+                                        if (recvLen > 0)
+                                            ReadPacketQ.put(byteBuffer);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
-                            }
-                            else{
-                                try {
-                                    Log.i(TAG, "rv:"+recvLen);
-                                    if(recvLen > 0)
-                                        ReadPacketQ.put(byteBuffer);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
+                            } else {
+//                            Log.i(TAG, "other endpoint");
                             }
                         }
-                        else{
-                            Log.i(TAG, "other endpoint");
-                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                        Log.i(TAG, "ReadRequest Error");
                     }
                 }
             }
@@ -196,7 +196,7 @@ abstract class NLUSBStream implements NLCommStream{
     }
 
 
-	int read(byte[] dst, int length, int timeout)	{
+    int read(byte[] dst, int length, int timeout)	{
         try {
             ByteBuffer byteBuffer = ReadPacketQ.poll(timeout, TimeUnit.MILLISECONDS);
             if(byteBuffer == null)
@@ -211,9 +211,9 @@ abstract class NLUSBStream implements NLCommStream{
             e.printStackTrace();
         }
         return -2;
-	}
+    }
 
-	int write(byte[] src, int len, int timeout) {
+    int write(byte[] src, int len, int timeout) {
         if(connection != null)
             return connection.bulkTransfer(writeEndpoint, src,  len, timeout);
         return -2;
@@ -251,24 +251,24 @@ abstract class NLUSBStream implements NLCommStream{
         return plugFlag;
     }
 
-	private byte[] cmdFeature = {(byte)0xFE, 0};
-	boolean hidChangeInterface(boolean change) {
-	    if(dataInterface == null)
-	        return false;
-		cmdFeature[0]     = (byte)0xFE;
-		cmdFeature[1]     = (byte)(change ? 1 : 0);
-		final int timeout = 2000;
-		final int type    = UsbConstants.USB_TYPE_CLASS | 1;
-		final int request = 0x09;
-		final int value   = (3 << 8) | 0xFE;
-		final int index   = dataInterface.getId();
-		final int ret = connection.controlTransfer(type, request, value, index, cmdFeature, 2, timeout);
-		return ret == 0 || ret == 2;
-	}
+    private byte[] cmdFeature = {(byte)0xFE, 0};
+    boolean hidChangeInterface(boolean change) {
+        if(dataInterface == null)
+            return false;
+        cmdFeature[0]     = (byte)0xFE;
+        cmdFeature[1]     = (byte)(change ? 1 : 0);
+        final int timeout = 2000;
+        final int type    = UsbConstants.USB_TYPE_CLASS | 1;
+        final int request = 0x09;
+        final int value   = (3 << 8) | 0xFE;
+        final int index   = dataInterface.getId();
+        final int ret = connection.controlTransfer(type, request, value, index, cmdFeature, 2, timeout);
+        return ret == 0 || ret == 2;
+    }
 
 
     private boolean openUsb(UsbDevice device) {
-	    int endpointType;
+        int endpointType;
 
         switch (devCls)
         {
@@ -292,7 +292,6 @@ abstract class NLUSBStream implements NLCommStream{
         readEndpoint     = null;
         writeEndpoint    = null;
         final int count   = device.getInterfaceCount();
-        System.out.println("count:" + count);
         for (int i = 0; i < count; ++i) {
             UsbInterface iface = device.getInterface(i);
             final int cls = iface.getInterfaceClass();

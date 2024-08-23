@@ -9,13 +9,22 @@ import android.content.Context;
  */
 public interface NLCommStream {
     enum DevClass {DEV_SOC, DEV_MCU}
-    int  readPacket(byte[] dst, int pos, int length, int timeout);
-    boolean  writePacket(byte[] dst, int pos, int length);
+
+    int readPacket(byte[] dst, int pos, int length, int timeout);
+
+    boolean writePacket(byte[] dst, int pos, int length);
+
     boolean open(Context context);
+
     boolean open(String pathName, int baudrate);
+
     void setUsbListener(NLDeviceStream.NLUsbListener listener);
+
     void close(Context context);
+
     boolean isOpen();
+
     boolean isPlug();
+
     void setReadAck(boolean flag);
 }

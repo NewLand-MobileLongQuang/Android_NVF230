@@ -2,6 +2,7 @@ package com.nlscan.nlsdk;
 
 import android.content.Context;
 import android.os.SystemClock;
+import android.util.Log;
 
 import com.aill.androidserialport.SerialPort;
 
@@ -11,32 +12,33 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
-  * This class is implemented based on Google's official SerialPort class (https://github.com/cepr/android-serialport-api),
-  * Implemented a unified communication device interface NLCommStream.
-  * If you need to realize the query function of the serial port, you can use the methods in the SerialPortFinder class.
-  * If you encounter the problem that the serial port cannot be opened due to permission reasons, please set the open permission of the serial device by yourself.
-  * The SerialPort class has a reference example, it is not implemented here.
-  * Note: The implementation of SerialPort here has not been rigorously tested.
-  */
+ * This class is implemented based on Google's official SerialPort class (https://github.com/cepr/android-serialport-api),
+ * Implemented a unified communication device interface NLCommStream.
+ * If you need to realize the query function of the serial port, you can use the methods in the SerialPortFinder class.
+ * If you encounter the problem that the serial port cannot be opened due to permission reasons, please set the open permission of the serial device by yourself.
+ * The SerialPort class has a reference example, it is not implemented here.
+ * Note: The implementation of SerialPort here has not been rigorously tested.
+ */
 
 public class NLUartStream implements NLCommStream {
     private SerialPort serialPort;
     private OutputStream outputStream;
     private InputStream inputStream;
-    private boolean isUartOpen=false;
+    private boolean isUartOpen = false;
+
     /**
-     * @param dst  receive buffer
-     * @param pos  receive buffer offset
-     * @param length maximum receiving length
+     * @param dst     receive buffer
+     * @param pos     receive buffer offset
+     * @param length  maximum receiving length
      * @param timeout overtime time
      * @return The number of bytes read within the specified time
      */
     @Override
     public int readPacket(byte[] dst, int pos, int length, int timeout) {
-        int size=0;
+        int size = 0;
         long stime, etime;
 
-        if(dst == null || length == 0)
+        if (dst == null || length == 0)
             return 0;
 
         stime = SystemClock.uptimeMillis();
@@ -45,8 +47,7 @@ public class NLUartStream implements NLCommStream {
                 if (inputStream.available() > 0) {
                     size += inputStream.read(dst, (size + pos), length - size);
                     stime = SystemClock.uptimeMillis();
-                }
-                else{
+                } else {
                     Thread.sleep(10);
                 }
 
@@ -59,14 +60,14 @@ public class NLUartStream implements NLCommStream {
     }
 
     /**
-     * @param dst send buffer
-     * @param pos buffer offset
+     * @param dst    send buffer
+     * @param pos    buffer offset
      * @param length send length
      * @return success or failure
      */
     @Override
     public boolean writePacket(byte[] dst, int pos, int length) {
-        if((dst == null) || (length <= pos))
+        if ((dst == null) || (length <= pos))
             return false;
         try {
             outputStream.write(dst, pos, length);
@@ -94,7 +95,7 @@ public class NLUartStream implements NLCommStream {
             inputStream = serialPort.getInputStream();
             outputStream = serialPort.getOutputStream();
         } catch (IOException e) {
-            System.out.println("The device file could not be found");
+            Log.e("NLUartStream","The device file could not be found");
             return false;
         }
         isUartOpen = true;
@@ -112,9 +113,9 @@ public class NLUartStream implements NLCommStream {
      */
     @Override
     public void close(Context context) {
-        if(isUartOpen) {
-        isUartOpen = false;
-        serialPort.close();
+        if (isUartOpen) {
+            isUartOpen = false;
+            serialPort.close();
         }
     }
 
@@ -123,7 +124,7 @@ public class NLUartStream implements NLCommStream {
      */
     @Override
     public boolean isOpen() {
-        return isUartOpen ;
+        return isUartOpen;
     }
 
     @Override
@@ -132,5 +133,6 @@ public class NLUartStream implements NLCommStream {
     }
 
     @Override
-    public void setReadAck(boolean flag){ }
+    public void setReadAck(boolean flag) {
+    }
 }

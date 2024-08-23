@@ -4,10 +4,10 @@ Date:   Tue Jan 2 13:13:04 2024 +0800
 
     添加到系统app中
 
-diff --git a/app/src/main/java/com/nlscan/scantool/MainActivity.java b/app/src/main/java/com/nlscan/scantool/MainActivity.java
+diff --git a/app/src/main/java/com/nlscan/scanhub/MainActivity.java b/app/src/main/java/com/nlscan/scanhub/MainActivity.java
 index 00bbbc3..507bfdf 100755
---- a/app/src/main/java/com/nlscan/scantool/MainActivity.java
-+++ b/app/src/main/java/com/nlscan/scantool/MainActivity.java
+--- a/app/src/main/java/com/nlscan/scanhub/MainActivity.java
++++ b/app/src/main/java/com/nlscan/scanhub/MainActivity.java
 @@ -46,6 +46,12 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
  import io.reactivex.functions.Consumer;
  import io.reactivex.schedulers.Schedulers;
@@ -24,7 +24,7 @@ index 00bbbc3..507bfdf 100755
 @@ -100,10 +106,28 @@ public class MainActivity extends AppCompatActivity {
          etResult.setFocusable(false);
          etResult.setFocusableInTouchMode(false);
-         setTitle("ScanTool SDK"+ds.GetSdkVersion());
+         setTitle("N-ScanHub SDK"+ds.GetSdkVersion());
 +        Log.d(TAG, "ifree onCreate.");
 +        try{
 +               PrintWriter pw_broadcast_finish = new PrintWriter("/sys/bus/platform/devices/soc:qcom,scanner/power_gpio");

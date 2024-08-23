@@ -1,3 +1,4 @@
 include ':app', ':nlsdk'
-rootProject.name='ScanTool'
+rootProject.name='N-ScanHub'
 include ':serial-port'
+include ':lfilepickerlibrary'

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ScanTool</string>
+    <string name="app_name">N-ScanHub</string>
     <string name="TextRestart">Reboot Device</string>
     <string name="TextClear">Clear</string>
     <string name="TextChkDev">Check Device</string>
@@ -34,12 +34,22 @@
     <string name="CustomPrefixSwitch">Custom Prefix Switch</string>
     <string name="TerminatingCharacterSuffix">Terminating Character Suffix</string>
     <string name="HintLength2">00-FF Length:2</string>
-    <string name="TextQueryCommand" >Query Command</string>
-    <string name="SelectFile" >Select File</string>
-    <string name="TextInfoPlugin" >Plug in device</string>
-    <string name="TextInfoPlugout" >Plug out device</string>
-    <string name="TextInfoUpdate" >FW Upgrade</string>
-    <string name="TextUpdateConfig" >Config Update</string>
-    <string name="TextInfoUpdating" >Updating......</string>
+    <string name="TextQueryCommand">Query Command</string>
+    <string name="SelectFile">Select File</string>
+    <string name="TextInfoPlugin">Plug in device</string>
+    <string name="TextInfoPlugout">Plug out device</string>
+    <string name="TextInfoUpdate">FW Upgrade</string>
+    <string name="TextUpdateConfig">Config Update</string>
+    <string name="TextInfoUpdating">Updating......</string>
+    <string name="dev_com">/dev/ttyMT1</string>
+    <string name="baud">9600</string>
+    <string name="output_barcode_encode">Please select the output Barcode encoding</string>
+    <string name="barcode_encode">Barcode Encode</string>
+
+    <array name="encode_item">
+        <item>Default encoding</item>
+        <item>UTF-8</item>
+        <item>GBK</item>
+    </array>
 
 </resources>

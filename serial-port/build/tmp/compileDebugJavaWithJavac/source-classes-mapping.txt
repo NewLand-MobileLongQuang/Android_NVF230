@@ -1,7 +1,0 @@
-com/aill/androidserialport/SerialPort.java
- com.aill.androidserialport.SerialPort
-com/aill/androidserialport/SerialPortFinder.java
- com.aill.androidserialport.SerialPortFinder
- com.aill.androidserialport.SerialPortFinder$Driver
-android_serialport_api/BuildConfig.java
- android_serialport_api.BuildConfig
