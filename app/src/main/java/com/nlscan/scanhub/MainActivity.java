@@ -66,6 +66,9 @@ import io.reactivex.schedulers.Schedulers;
 public class MainActivity extends AppCompatActivity {
     private byte[] barcodeBuff = new byte[2 * 1024];
     private int barcodeLen = 0;
+    private int totalBags = 0;
+    private int scannedBags = 0;
+    private int errorBags = 0;
 
     private NLDeviceStream ds = new NLDevice(NLDeviceStream.DevClass.DEV_COMPOSITE);
     private String deviceInfo = null;
@@ -425,18 +428,20 @@ public class MainActivity extends AppCompatActivity {
                         } else {
                             str = new String(barcodeBuff, 0, barcodeLen);
                         }
-
+                        
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                totalBags++;
                                 if (barcodeLen < 5) {
                                     if (mediaPlayerERR != null) {
                                         if (!mediaPlayerERR.isPlaying()) {
                                             mediaPlayerERR.start();
                                         }
                                     }
+                                    errorBags++;
                                     showText("", "KHONG QUET DUOC");
-                                } else {
+                                } else if (barcodeLen > 5){
                                     if (mediaPlayerERR != null && mediaPlayerERR.isPlaying()) {
                                         mediaPlayerERR.pause();
                                         mediaPlayerERR.seekTo(0);
@@ -447,9 +452,10 @@ public class MainActivity extends AppCompatActivity {
                                             mediaPlayerSUC.start();
                                         }
                                     }
-
+                                    scannedBags++;
                                     showText(prefix, str);
                                 }
+                                updateTextViews();
                             }
                         });
                     }
@@ -465,6 +471,17 @@ public class MainActivity extends AppCompatActivity {
         usbOpenChecked = true;
         setEnable(true);
     }
+
+    private void updateTextViews() {
+        TextView tvTotalBags = findViewById(R.id.tvTotalBags);
+        TextView tvScannedBags = findViewById(R.id.tvScannedBags);
+        TextView tvErrorBags = findViewById(R.id.tvErrorBags);
+
+        tvTotalBags.setText("Tổng số bao: " + totalBags);
+        tvScannedBags.setText("Tổng số bao quét được: " + scannedBags);
+        tvErrorBags.setText("Tổng số bao lỗi: " + errorBags);
+    }
+
 
     //    @OnItemSelected(R.id.spCommtype)
     void onCommselect(int position) {
@@ -865,9 +882,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void showText(String prefix, String text) {
-            etResult.append(prefix);
-            etResult.append(text);
-            etResult.append("\n");
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        String currentTime = sdf.format(new Date());
+
+        etResult.append(currentTime + " - ");
+        etResult.append(prefix);
+        etResult.append(text);
+        etResult.append("\n");
     }
 
     void msgbox(String text, String title) {

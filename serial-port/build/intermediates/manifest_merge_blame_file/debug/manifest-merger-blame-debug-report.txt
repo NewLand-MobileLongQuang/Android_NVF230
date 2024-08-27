@@ -3,6 +3,6 @@
 3    package="com.aill.androidserialport" >
 4
 5    <uses-sdk android:minSdkVersion="21" />
-5-->/Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml
+5-->/Users/leson/Documents/GitHub/Android_NVF230/serial-port/src/main/AndroidManifest.xml
 6
 7</manifest>
