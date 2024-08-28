@@ -54,14 +54,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
-/**
- * Created on 2020/6/29
- *
- * @author xuj@nlscan.com
- * @description This demo can use USB and physical serial port to communicate with the scanner device.
- * The key here is to specify the type of communication you want to use when creating the device.
- * The type is specified by (NLDeviceStream.DevClass).
- */
 
 public class MainActivity extends AppCompatActivity {
     private byte[] barcodeBuff = new byte[2 * 1024];
@@ -90,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
     Button bnSenseMode;
     Button bnGetImg;
     Button bnEncode;
+    Button bnLQScan;
     Button bnUpdateConfig;
     TextView editSerialname;
     TextView editBaud;
@@ -99,17 +92,12 @@ public class MainActivity extends AppCompatActivity {
     MediaPlayer mediaPlayerSUC;
 
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        ButterKnife.bind(this);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-//        binding = ActivityMainBinding.inflate(getLayoutInflater());
-//        setContentView(binding.getRoot());
-
+        bnLQScan = binding.bnLQScan;
         bnClearResult = binding.bnClearResult;
         bnScanBarcode = binding.bnScanBarcode;
         bnGetDeviceInfo = binding.bnGetDeviceInfo;
@@ -138,9 +126,17 @@ public class MainActivity extends AppCompatActivity {
         setTitle("N-ScanHub SDK " + ds.nl_GetSdkVersion());
         mediaPlayerERR = MediaPlayer.create(this, R.raw.error1);
         mediaPlayerSUC = MediaPlayer.create(this, R.raw.beep);
+        bnLQScan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Create an Intent to start LQscanActivity
+                Intent intent = new Intent(MainActivity.this, LQscanActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
 
-    // 跳转至设置页面，让用户手动开启
     public void setting(Activity activity) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (!Environment.isExternalStorageManager()) {
@@ -185,10 +181,6 @@ public class MainActivity extends AppCompatActivity {
         bnScanBarcode.setOnClickListener(view -> {
             OnScanBarcode();
         });
-        //R.id.bnQueCfg
-        bnQueCfg.setOnClickListener(view -> {
-            OnQueCfg();
-        });
         //R.id.bnScanEnable
         bnScanEnable.setOnClickListener(view -> {
             onScanEnable();
@@ -197,25 +189,15 @@ public class MainActivity extends AppCompatActivity {
         bnSenseMode.setOnClickListener(view -> {
             onSetSenseMode();
         });
-        //R.id.bnUpdateFirmware
-        bnUpdateFirmware.setOnClickListener(view -> {
-            OnUpdate();
-        });
-        //R.id.bnUpdateConfig
-        bnUpdateConfig.setOnClickListener(view -> {
-            onUpdateConfig();
-        });
-        //R.id.txtFilePath
-        txtFilePath.setOnClickListener(view -> {
-            OnSelectFile();
-        });
-        //R.id.bnGetImg
-        bnGetImg.setOnClickListener(view -> {
-            GetImg();
-        });
         //R.id.bnEncode
         bnEncode.setOnClickListener(view -> {
             showSingleChoiceDialog();
+        });
+
+        // LQ scan
+        bnLQScan.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, com.nlscan.scanhub.LQscanActivity.class);
+            startActivity(intent);
         });
     }
 
@@ -255,12 +237,8 @@ public class MainActivity extends AppCompatActivity {
 
             return true;
         }
-
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-//                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_MEDIA_IMAGES,
-//                        Manifest.permission.READ_MEDIA_AUDIO,
-//                        Manifest.permission.READ_MEDIA_VIDEO,Manifest.permission.READ_EXTERNAL_STORAGE}, 2);
                 setting(this);
             } else {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 2);
@@ -465,7 +443,6 @@ public class MainActivity extends AppCompatActivity {
         usbOpenChecked = true;
         setEnable(true);
     }
-
     //    @OnItemSelected(R.id.spCommtype)
     void onCommselect(int position) {
         Log.d(TAG, "onCommselect: " + position);
@@ -493,28 +470,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-    /**
-     *
-     */
-//    @OnClick(R.id.bnClearResult)
     void OnClearResult() {
         etResult.setText("");
     }
-
-
-    /**
-     *
-     */
 //    @OnClick(R.id.bnGetDeviceInfo)
     void OnGetDeviceInfo() {
         deviceInfo = ds.nl_GetDeviceInfo();
         msgbox((deviceInfo != null ? deviceInfo : ""), "Device Information");
     }
 
-    /**
-     *
-     */
 //    @OnClick(R.id.bnRestartDevice)
     void OnRestartDevice() {
         ds.nl_RestartDevice();
@@ -522,9 +486,6 @@ public class MainActivity extends AppCompatActivity {
         bnOpenDevice.setText(R.string.TextOpen);
     }
 
-    /**
-     *
-     */
 //    @OnClick(R.id.bnScanBarcode)
     void OnScanBarcode() {
         if (!scanBarCode()) {
@@ -532,23 +493,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Query configuration
-     */
-//    @OnClick(R.id.bnQueCfg)
-    void OnQueCfg() {
-        String strCommand;
-        String strCommandAck;
-        strCommand = editConfig.getText().toString();
-        strCommandAck = ds.nl_ReadDevCfg(strCommand);
-        if (strCommandAck != null)
-            etResult.setText(strCommandAck);
-
-    }
-
-    /**
-     * Start decoding
-     */
 //    @OnClick(R.id.bnScanEnable)
     void onScanEnable() {
         if (!ds.nl_SendCommand("SCNENA1")) {
@@ -556,117 +500,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Configured as sensing mode
-     */
-//    @OnClick(R.id.bnSenseMode)
     void onSetSenseMode() {
         if (!ds.nl_SendCommand("SCNMOD2")) {
             ShowToast(getString(R.string.TextConfigErr));
         }
     }
 
-    /**
-     * Firmware update
-     */
-//    @OnClick(R.id.bnUpdateFirmware)
-    void OnUpdate() {
-        int len;
-
-        if (newFwPath == null)
-            return;
-
-        File file = new File(newFwPath);
-        if (file.exists() && file.isFile()) {
-            len = (int) file.length();
-        } else {
-            Log.d(TAG, "file doesn't exist or is not a file");
-            return;
-        }
-        byte[] firmware = new byte[len];
-        readFile(firmware, file);
-        pbUpdate.setVisibility(View.VISIBLE);
-        class Update implements Runnable {
-            public void run() {
-                ds.nl_UpdateKernelDevice(firmware, new NLDeviceStream.NLUpdateListner() {
-                    @Override
-                    public void curProgress(String type, NLDeviceStream.NLUpdateState state, int percent) {
-                        Log.d(TAG, type + ":" + state + " " + percent);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                // update
-                                pbUpdate.setProgress(percent);
-                                if (type.equals("END update")) {
-                                    showText("Firmware:", "Update success!");
-                                    pbUpdate.setVisibility(View.GONE);
-                                }
-                            }
-                        });
-                    }
-                });
-            }
-        }
-        Thread t = new Thread(new Update());
-        t.start();
-        bnOpenDevice.setText(R.string.TextOpen);
-    }
-
-    //    @OnClick(R.id.bnUpdateConfig)
-    void onUpdateConfig() {
-        if (newFwPath == null)
-            return;
-
-        File file = new File(newFwPath);
-        if (!file.exists() || !file.isFile() || !newFwPath.toLowerCase().endsWith(".xml")) {
-            Log.d(TAG, "file doesn't exist or is not a xml file");
-            return;
-        }
-        class UpdateConfig implements Runnable {
-            public void run() {
-                int ret = ds.nl_WriteCfgToDev(file);
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (ret > 0) {
-                            showText("Config:", "xml update success!");
-                        } else if (ret == 0) {
-                            showText("Config:", "xml update success and change interface!");
-                            ds.nl_CloseDevice();
-                            setEnable(false);
-                            usbOpenChecked = false;
-                            bnOpenDevice.setText(R.string.TextOpen);
-                        } else {
-                            showText("Config:", "xml update fail!");
-                        }
-                    }
-                });
-            }
-        }
-        Thread t = new Thread(new UpdateConfig());
-        t.start();
-    }
-
-    @SuppressLint("SdCardPath")
-//    @OnClick(R.id.txtFilePath)
-    void OnSelectFile() {
-        new LFilePicker()
-                .withActivity(MainActivity.this)
-                .withRequestCode(REQ_CODE_SELECT_FW)
-                .withStartPath("/sdcard")
-                .withFileFilter(new String[]{".bin", ".bin2", ".pak", ".xml"})
-                .withMutilyMode(false)
-                .start();
-    }
-
-    /**
-     * Receive the message of the file selection control and display the file path
-     *
-     * @param requestCode request order
-     * @param resultCode  request execution result
-     * @param data        request return path parameters
-     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -676,184 +515,6 @@ public class MainActivity extends AppCompatActivity {
                 newFwPath = list.get(0);
                 txtFilePath.setText(newFwPath);
             }
-        }
-    }
-
-    private void isDirPathExist(String dirPath) {
-        File file = new File(dirPath);
-        if (!file.exists()) {
-            if (!file.mkdirs())
-                Toast.makeText(getApplicationContext(), R.string.TextCreateBmpPathFail, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void saveImage(byte[] bitmap, int w, int h) {
-        @SuppressLint("SdCardPath") String dirPath = "/sdcard/newland/saveImages";
-        byte[] bmp_head = {
-                (byte) 0x42, (byte) 0x4d,
-                (byte) 0x36, (byte) 0xb4, (byte) 0x04, (byte) 0x00,    // 640*480+1078
-                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x36, (byte) 0x04, (byte) 0x00, (byte) 0x00, (byte) 0x28, (byte) 0x00, 0x00, (byte) 0x00,
-                (byte) 0x80, (byte) 0x02, (byte) 0x00, (byte) 0x00,    // 640
-                (byte) 0xe0, (byte) 0x01, (byte) 0x00, (byte) 0x00,    // 480
-                (byte) 0x01, (byte) 0x00, (byte) 0x08, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-                (byte) 0x00, (byte) 0x00, (byte) 0x82, (byte) 0x05, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01, (byte) 0x01, (byte) 0x01, (byte) 0x00, (byte) 0x02, (byte) 0x02, (byte) 0x02,
-                (byte) 0x00, (byte) 0x03, (byte) 0x03, (byte) 0x03, (byte) 0x00, (byte) 0x04, (byte) 0x04, (byte) 0x04, (byte) 0x00, (byte) 0x05, (byte) 0x05, (byte) 0x05, (byte) 0x00, (byte) 0x06, (byte) 0x06, (byte) 0x06,
-                (byte) 0x00, (byte) 0x07, (byte) 0x07, (byte) 0x07, (byte) 0x00, (byte) 0x08, (byte) 0x08, (byte) 0x08, (byte) 0x00, (byte) 0x09, (byte) 0x09, (byte) 0x09, (byte) 0x00, (byte) 0x0a, (byte) 0x0a, (byte) 0x0a,
-                (byte) 0x00, (byte) 0x0b, (byte) 0x0b, (byte) 0x0b, (byte) 0x00, (byte) 0x0c, (byte) 0x0c, (byte) 0x0c, (byte) 0x00, (byte) 0x0d, (byte) 0x0d, (byte) 0x0d, (byte) 0x00, (byte) 0x0e, (byte) 0x0e, (byte) 0x0e,
-                (byte) 0x00, (byte) 0x0f, (byte) 0x0f, (byte) 0x0f, (byte) 0x00, (byte) 0x10, (byte) 0x10, (byte) 0x10, (byte) 0x00, (byte) 0x11, (byte) 0x11, (byte) 0x11, (byte) 0x00, (byte) 0x12, (byte) 0x12, (byte) 0x12,
-                (byte) 0x00, (byte) 0x13, (byte) 0x13, (byte) 0x13, (byte) 0x00, (byte) 0x14, (byte) 0x14, (byte) 0x14, (byte) 0x00, (byte) 0x15, (byte) 0x15, (byte) 0x15, (byte) 0x00, (byte) 0x16, (byte) 0x16, (byte) 0x16,
-                (byte) 0x00, (byte) 0x17, (byte) 0x17, (byte) 0x17, (byte) 0x00, (byte) 0x18, (byte) 0x18, (byte) 0x18, (byte) 0x00, (byte) 0x19, (byte) 0x19, (byte) 0x19, (byte) 0x00, (byte) 0x1a, (byte) 0x1a, (byte) 0x1a,
-                (byte) 0x00, (byte) 0x1b, (byte) 0x1b, (byte) 0x1b, (byte) 0x00, (byte) 0x1c, (byte) 0x1c, (byte) 0x1c, (byte) 0x00, (byte) 0x1d, (byte) 0x1d, (byte) 0x1d, (byte) 0x00, (byte) 0x1e, (byte) 0x1e, (byte) 0x1e,
-                (byte) 0x00, (byte) 0x1f, (byte) 0x1f, (byte) 0x1f, (byte) 0x00, (byte) 0x20, (byte) 0x20, (byte) 0x20, (byte) 0x00, (byte) 0x21, (byte) 0x21, (byte) 0x21, (byte) 0x00, (byte) 0x22, (byte) 0x22, (byte) 0x22,
-                (byte) 0x00, (byte) 0x23, (byte) 0x23, (byte) 0x23, (byte) 0x00, (byte) 0x24, (byte) 0x24, (byte) 0x24, (byte) 0x00, (byte) 0x25, (byte) 0x25, (byte) 0x25, (byte) 0x00, (byte) 0x26, (byte) 0x26, (byte) 0x26,
-                (byte) 0x00, (byte) 0x27, (byte) 0x27, (byte) 0x27, (byte) 0x00, (byte) 0x28, (byte) 0x28, (byte) 0x28, (byte) 0x00, (byte) 0x29, (byte) 0x29, (byte) 0x29, (byte) 0x00, (byte) 0x2a, (byte) 0x2a, (byte) 0x2a,
-                (byte) 0x00, (byte) 0x2b, (byte) 0x2b, (byte) 0x2b, (byte) 0x00, (byte) 0x2c, (byte) 0x2c, (byte) 0x2c, (byte) 0x00, (byte) 0x2d, (byte) 0x2d, (byte) 0x2d, (byte) 0x00, (byte) 0x2e, (byte) 0x2e, (byte) 0x2e,
-                (byte) 0x00, (byte) 0x2f, (byte) 0x2f, (byte) 0x2f, (byte) 0x00, (byte) 0x30, (byte) 0x30, (byte) 0x30, (byte) 0x00, (byte) 0x31, (byte) 0x31, (byte) 0x31, (byte) 0x00, (byte) 0x32, (byte) 0x32, (byte) 0x32,
-                (byte) 0x00, (byte) 0x33, (byte) 0x33, (byte) 0x33, (byte) 0x00, (byte) 0x34, (byte) 0x34, (byte) 0x34, (byte) 0x00, (byte) 0x35, (byte) 0x35, (byte) 0x35, (byte) 0x00, (byte) 0x36, (byte) 0x36, (byte) 0x36,
-                (byte) 0x00, (byte) 0x37, (byte) 0x37, (byte) 0x37, (byte) 0x00, (byte) 0x38, (byte) 0x38, (byte) 0x38, (byte) 0x00, (byte) 0x39, (byte) 0x39, (byte) 0x39, (byte) 0x00, (byte) 0x3a, (byte) 0x3a, (byte) 0x3a,
-                (byte) 0x00, (byte) 0x3b, (byte) 0x3b, (byte) 0x3b, (byte) 0x00, (byte) 0x3c, (byte) 0x3c, (byte) 0x3c, (byte) 0x00, (byte) 0x3d, (byte) 0x3d, (byte) 0x3d, (byte) 0x00, (byte) 0x3e, (byte) 0x3e, (byte) 0x3e,
-                (byte) 0x00, (byte) 0x3f, (byte) 0x3f, (byte) 0x3f, (byte) 0x00, (byte) 0x40, (byte) 0x40, (byte) 0x40, (byte) 0x00, (byte) 0x41, (byte) 0x41, (byte) 0x41, (byte) 0x00, (byte) 0x42, (byte) 0x42, (byte) 0x42,
-                (byte) 0x00, (byte) 0x43, (byte) 0x43, (byte) 0x43, (byte) 0x00, (byte) 0x44, (byte) 0x44, (byte) 0x44, (byte) 0x00, (byte) 0x45, (byte) 0x45, (byte) 0x45, (byte) 0x00, (byte) 0x46, (byte) 0x46, (byte) 0x46,
-                (byte) 0x00, (byte) 0x47, (byte) 0x47, (byte) 0x47, (byte) 0x00, (byte) 0x48, (byte) 0x48, (byte) 0x48, (byte) 0x00, (byte) 0x49, (byte) 0x49, (byte) 0x49, (byte) 0x00, (byte) 0x4a, (byte) 0x4a, (byte) 0x4a,
-                (byte) 0x00, (byte) 0x4b, (byte) 0x4b, (byte) 0x4b, (byte) 0x00, (byte) 0x4c, (byte) 0x4c, (byte) 0x4c, (byte) 0x00, (byte) 0x4d, (byte) 0x4d, (byte) 0x4d, (byte) 0x00, (byte) 0x4e, (byte) 0x4e, (byte) 0x4e,
-                (byte) 0x00, (byte) 0x4f, (byte) 0x4f, (byte) 0x4f, (byte) 0x00, (byte) 0x50, (byte) 0x50, (byte) 0x50, (byte) 0x00, (byte) 0x51, (byte) 0x51, (byte) 0x51, (byte) 0x00, (byte) 0x52, (byte) 0x52, (byte) 0x52,
-                (byte) 0x00, (byte) 0x53, (byte) 0x53, (byte) 0x53, (byte) 0x00, (byte) 0x54, (byte) 0x54, (byte) 0x54, (byte) 0x00, (byte) 0x55, (byte) 0x55, (byte) 0x55, (byte) 0x00, (byte) 0x56, (byte) 0x56, (byte) 0x56,
-                (byte) 0x00, (byte) 0x57, (byte) 0x57, (byte) 0x57, (byte) 0x00, (byte) 0x58, (byte) 0x58, (byte) 0x58, (byte) 0x00, (byte) 0x59, (byte) 0x59, (byte) 0x59, (byte) 0x00, (byte) 0x5a, (byte) 0x5a, (byte) 0x5a,
-                (byte) 0x00, (byte) 0x5b, (byte) 0x5b, (byte) 0x5b, (byte) 0x00, (byte) 0x5c, (byte) 0x5c, (byte) 0x5c, (byte) 0x00, (byte) 0x5d, (byte) 0x5d, (byte) 0x5d, (byte) 0x00, (byte) 0x5e, (byte) 0x5e, (byte) 0x5e,
-                (byte) 0x00, (byte) 0x5f, (byte) 0x5f, (byte) 0x5f, (byte) 0x00, (byte) 0x60, (byte) 0x60, (byte) 0x60, (byte) 0x00, (byte) 0x61, (byte) 0x61, (byte) 0x61, (byte) 0x00, (byte) 0x62, (byte) 0x62, (byte) 0x62,
-                (byte) 0x00, (byte) 0x63, (byte) 0x63, (byte) 0x63, (byte) 0x00, (byte) 0x64, (byte) 0x64, (byte) 0x64, (byte) 0x00, (byte) 0x65, (byte) 0x65, (byte) 0x65, (byte) 0x00, (byte) 0x66, (byte) 0x66, (byte) 0x66,
-                (byte) 0x00, (byte) 0x67, (byte) 0x67, (byte) 0x67, (byte) 0x00, (byte) 0x68, (byte) 0x68, (byte) 0x68, (byte) 0x00, (byte) 0x69, (byte) 0x69, (byte) 0x69, (byte) 0x00, (byte) 0x6a, (byte) 0x6a, (byte) 0x6a,
-                (byte) 0x00, (byte) 0x6b, (byte) 0x6b, (byte) 0x6b, (byte) 0x00, (byte) 0x6c, (byte) 0x6c, (byte) 0x6c, (byte) 0x00, (byte) 0x6d, (byte) 0x6d, (byte) 0x6d, (byte) 0x00, (byte) 0x6e, (byte) 0x6e, (byte) 0x6e,
-                (byte) 0x00, (byte) 0x6f, (byte) 0x6f, (byte) 0x6f, (byte) 0x00, (byte) 0x70, (byte) 0x70, (byte) 0x70, (byte) 0x00, (byte) 0x71, (byte) 0x71, (byte) 0x71, (byte) 0x00, (byte) 0x72, (byte) 0x72, (byte) 0x72,
-                (byte) 0x00, (byte) 0x73, (byte) 0x73, (byte) 0x73, (byte) 0x00, (byte) 0x74, (byte) 0x74, (byte) 0x74, (byte) 0x00, (byte) 0x75, (byte) 0x75, (byte) 0x75, (byte) 0x00, (byte) 0x76, (byte) 0x76, (byte) 0x76,
-                (byte) 0x00, (byte) 0x77, (byte) 0x77, (byte) 0x77, (byte) 0x00, (byte) 0x78, (byte) 0x78, (byte) 0x78, (byte) 0x00, (byte) 0x79, (byte) 0x79, (byte) 0x79, (byte) 0x00, (byte) 0x7a, (byte) 0x7a, (byte) 0x7a,
-                (byte) 0x00, (byte) 0x7b, (byte) 0x7b, (byte) 0x7b, (byte) 0x00, (byte) 0x7c, (byte) 0x7c, (byte) 0x7c, (byte) 0x00, (byte) 0x7d, (byte) 0x7d, (byte) 0x7d, (byte) 0x00, (byte) 0x7e, (byte) 0x7e, (byte) 0x7e,
-                (byte) 0x00, (byte) 0x7f, (byte) 0x7f, (byte) 0x7f, (byte) 0x00, (byte) 0x80, (byte) 0x80, (byte) 0x80, (byte) 0x00, (byte) 0x81, (byte) 0x81, (byte) 0x81, (byte) 0x00, (byte) 0x82, (byte) 0x82, (byte) 0x82,
-                (byte) 0x00, (byte) 0x83, (byte) 0x83, (byte) 0x83, (byte) 0x00, (byte) 0x84, (byte) 0x84, (byte) 0x84, (byte) 0x00, (byte) 0x85, (byte) 0x85, (byte) 0x85, (byte) 0x00, (byte) 0x86, (byte) 0x86, (byte) 0x86,
-                (byte) 0x00, (byte) 0x87, (byte) 0x87, (byte) 0x87, (byte) 0x00, (byte) 0x88, (byte) 0x88, (byte) 0x88, (byte) 0x00, (byte) 0x89, (byte) 0x89, (byte) 0x89, (byte) 0x00, (byte) 0x8a, (byte) 0x8a, (byte) 0x8a,
-                (byte) 0x00, (byte) 0x8b, (byte) 0x8b, (byte) 0x8b, (byte) 0x00, (byte) 0x8c, (byte) 0x8c, (byte) 0x8c, (byte) 0x00, (byte) 0x8d, (byte) 0x8d, (byte) 0x8d, (byte) 0x00, (byte) 0x8e, (byte) 0x8e, (byte) 0x8e,
-                (byte) 0x00, (byte) 0x8f, (byte) 0x8f, (byte) 0x8f, (byte) 0x00, (byte) 0x90, (byte) 0x90, (byte) 0x90, (byte) 0x00, (byte) 0x91, (byte) 0x91, (byte) 0x91, (byte) 0x00, (byte) 0x92, (byte) 0x92, (byte) 0x92,
-                (byte) 0x00, (byte) 0x93, (byte) 0x93, (byte) 0x93, (byte) 0x00, (byte) 0x94, (byte) 0x94, (byte) 0x94, (byte) 0x00, (byte) 0x95, (byte) 0x95, (byte) 0x95, (byte) 0x00, (byte) 0x96, (byte) 0x96, (byte) 0x96,
-                (byte) 0x00, (byte) 0x97, (byte) 0x97, (byte) 0x97, (byte) 0x00, (byte) 0x98, (byte) 0x98, (byte) 0x98, (byte) 0x00, (byte) 0x99, (byte) 0x99, (byte) 0x99, (byte) 0x00, (byte) 0x9a, (byte) 0x9a, (byte) 0x9a,
-                (byte) 0x00, (byte) 0x9b, (byte) 0x9b, (byte) 0x9b, (byte) 0x00, (byte) 0x9c, (byte) 0x9c, (byte) 0x9c, (byte) 0x00, (byte) 0x9d, (byte) 0x9d, (byte) 0x9d, (byte) 0x00, (byte) 0x9e, (byte) 0x9e, (byte) 0x9e,
-                (byte) 0x00, (byte) 0x9f, (byte) 0x9f, (byte) 0x9f, (byte) 0x00, (byte) 0xa0, (byte) 0xa0, (byte) 0xa0, (byte) 0x00, (byte) 0xa1, (byte) 0xa1, (byte) 0xa1, (byte) 0x00, (byte) 0xa2, (byte) 0xa2, (byte) 0xa2,
-                (byte) 0x00, (byte) 0xa3, (byte) 0xa3, (byte) 0xa3, (byte) 0x00, (byte) 0xa4, (byte) 0xa4, (byte) 0xa4, (byte) 0x00, (byte) 0xa5, (byte) 0xa5, (byte) 0xa5, (byte) 0x00, (byte) 0xa6, (byte) 0xa6, (byte) 0xa6,
-                (byte) 0x00, (byte) 0xa7, (byte) 0xa7, (byte) 0xa7, (byte) 0x00, (byte) 0xa8, (byte) 0xa8, (byte) 0xa8, (byte) 0x00, (byte) 0xa9, (byte) 0xa9, (byte) 0xa9, (byte) 0x00, (byte) 0xaa, (byte) 0xaa, (byte) 0xaa,
-                (byte) 0x00, (byte) 0xab, (byte) 0xab, (byte) 0xab, (byte) 0x00, (byte) 0xac, (byte) 0xac, (byte) 0xac, (byte) 0x00, (byte) 0xad, (byte) 0xad, (byte) 0xad, (byte) 0x00, (byte) 0xae, (byte) 0xae, (byte) 0xae,
-                (byte) 0x00, (byte) 0xaf, (byte) 0xaf, (byte) 0xaf, (byte) 0x00, (byte) 0xb0, (byte) 0xb0, (byte) 0xb0, (byte) 0x00, (byte) 0xb1, (byte) 0xb1, (byte) 0xb1, (byte) 0x00, (byte) 0xb2, (byte) 0xb2, (byte) 0xb2,
-                (byte) 0x00, (byte) 0xb3, (byte) 0xb3, (byte) 0xb3, (byte) 0x00, (byte) 0xb4, (byte) 0xb4, (byte) 0xb4, (byte) 0x00, (byte) 0xb5, (byte) 0xb5, (byte) 0xb5, (byte) 0x00, (byte) 0xb6, (byte) 0xb6, (byte) 0xb6,
-                (byte) 0x00, (byte) 0xb7, (byte) 0xb7, (byte) 0xb7, (byte) 0x00, (byte) 0xb8, (byte) 0xb8, (byte) 0xb8, (byte) 0x00, (byte) 0xb9, (byte) 0xb9, (byte) 0xb9, (byte) 0x00, (byte) 0xba, (byte) 0xba, (byte) 0xba,
-                (byte) 0x00, (byte) 0xbb, (byte) 0xbb, (byte) 0xbb, (byte) 0x00, (byte) 0xbc, (byte) 0xbc, (byte) 0xbc, (byte) 0x00, (byte) 0xbd, (byte) 0xbd, (byte) 0xbd, (byte) 0x00, (byte) 0xbe, (byte) 0xbe, (byte) 0xbe,
-                (byte) 0x00, (byte) 0xbf, (byte) 0xbf, (byte) 0xbf, (byte) 0x00, (byte) 0xc0, (byte) 0xc0, (byte) 0xc0, (byte) 0x00, (byte) 0xc1, (byte) 0xc1, (byte) 0xc1, (byte) 0x00, (byte) 0xc2, (byte) 0xc2, (byte) 0xc2,
-                (byte) 0x00, (byte) 0xc3, (byte) 0xc3, (byte) 0xc3, (byte) 0x00, (byte) 0xc4, (byte) 0xc4, (byte) 0xc4, (byte) 0x00, (byte) 0xc5, (byte) 0xc5, (byte) 0xc5, (byte) 0x00, (byte) 0xc6, (byte) 0xc6, (byte) 0xc6,
-                (byte) 0x00, (byte) 0xc7, (byte) 0xc7, (byte) 0xc7, (byte) 0x00, (byte) 0xc8, (byte) 0xc8, (byte) 0xc8, (byte) 0x00, (byte) 0xc9, (byte) 0xc9, (byte) 0xc9, (byte) 0x00, (byte) 0xca, (byte) 0xca, (byte) 0xca,
-                (byte) 0x00, (byte) 0xcb, (byte) 0xcb, (byte) 0xcb, (byte) 0x00, (byte) 0xcc, (byte) 0xcc, (byte) 0xcc, (byte) 0x00, (byte) 0xcd, (byte) 0xcd, (byte) 0xcd, (byte) 0x00, (byte) 0xce, (byte) 0xce, (byte) 0xce,
-                (byte) 0x00, (byte) 0xcf, (byte) 0xcf, (byte) 0xcf, (byte) 0x00, (byte) 0xd0, (byte) 0xd0, (byte) 0xd0, (byte) 0x00, (byte) 0xd1, (byte) 0xd1, (byte) 0xd1, (byte) 0x00, (byte) 0xd2, (byte) 0xd2, (byte) 0xd2,
-                (byte) 0x00, (byte) 0xd3, (byte) 0xd3, (byte) 0xd3, (byte) 0x00, (byte) 0xd4, (byte) 0xd4, (byte) 0xd4, (byte) 0x00, (byte) 0xd5, (byte) 0xd5, (byte) 0xd5, (byte) 0x00, (byte) 0xd6, (byte) 0xd6, (byte) 0xd6,
-                (byte) 0x00, (byte) 0xd7, (byte) 0xd7, (byte) 0xd7, (byte) 0x00, (byte) 0xd8, (byte) 0xd8, (byte) 0xd8, (byte) 0x00, (byte) 0xd9, (byte) 0xd9, (byte) 0xd9, (byte) 0x00, (byte) 0xda, (byte) 0xda, (byte) 0xda,
-                (byte) 0x00, (byte) 0xdb, (byte) 0xdb, (byte) 0xdb, (byte) 0x00, (byte) 0xdc, (byte) 0xdc, (byte) 0xdc, (byte) 0x00, (byte) 0xdd, (byte) 0xdd, (byte) 0xdd, (byte) 0x00, (byte) 0xde, (byte) 0xde, (byte) 0xde,
-                (byte) 0x00, (byte) 0xdf, (byte) 0xdf, (byte) 0xdf, (byte) 0x00, (byte) 0xe0, (byte) 0xe0, (byte) 0xe0, (byte) 0x00, (byte) 0xe1, (byte) 0xe1, (byte) 0xe1, (byte) 0x00, (byte) 0xe2, (byte) 0xe2, (byte) 0xe2,
-                (byte) 0x00, (byte) 0xe3, (byte) 0xe3, (byte) 0xe3, (byte) 0x00, (byte) 0xe4, (byte) 0xe4, (byte) 0xe4, (byte) 0x00, (byte) 0xe5, (byte) 0xe5, (byte) 0xe5, (byte) 0x00, (byte) 0xe6, (byte) 0xe6, (byte) 0xe6,
-                (byte) 0x00, (byte) 0xe7, (byte) 0xe7, (byte) 0xe7, (byte) 0x00, (byte) 0xe8, (byte) 0xe8, (byte) 0xe8, (byte) 0x00, (byte) 0xe9, (byte) 0xe9, (byte) 0xe9, (byte) 0x00, (byte) 0xea, (byte) 0xea, (byte) 0xea,
-                (byte) 0x00, (byte) 0xeb, (byte) 0xeb, (byte) 0xeb, (byte) 0x00, (byte) 0xec, (byte) 0xec, (byte) 0xec, (byte) 0x00, (byte) 0xed, (byte) 0xed, (byte) 0xed, (byte) 0x00, (byte) 0xee, (byte) 0xee, (byte) 0xee,
-                (byte) 0x00, (byte) 0xef, (byte) 0xef, (byte) 0xef, (byte) 0x00, (byte) 0xf0, (byte) 0xf0, (byte) 0xf0, (byte) 0x00, (byte) 0xf1, (byte) 0xf1, (byte) 0xf1, (byte) 0x00, (byte) 0xf2, (byte) 0xf2, (byte) 0xf2,
-                (byte) 0x00, (byte) 0xf3, (byte) 0xf3, (byte) 0xf3, (byte) 0x00, (byte) 0xf4, (byte) 0xf4, (byte) 0xf4, (byte) 0x00, (byte) 0xf5, (byte) 0xf5, (byte) 0xf5, (byte) 0x00, (byte) 0xf6, (byte) 0xf6, (byte) 0xf6,
-                (byte) 0x00, (byte) 0xf7, (byte) 0xf7, (byte) 0xf7, (byte) 0x00, (byte) 0xf8, (byte) 0xf8, (byte) 0xf8, (byte) 0x00, (byte) 0xf9, (byte) 0xf9, (byte) 0xf9, (byte) 0x00, (byte) 0xfa, (byte) 0xfa, (byte) 0xfa,
-                (byte) 0x00, (byte) 0xfb, (byte) 0xfb, (byte) 0xfb, (byte) 0x00, (byte) 0xfc, (byte) 0xfc, (byte) 0xfc, (byte) 0x00, (byte) 0xfd, (byte) 0xfd, (byte) 0xfd, (byte) 0x00, (byte) 0xfe, (byte) 0xfe, (byte) 0xfe,
-                (byte) 0x00, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0x00,
-        };
-
-
-        isDirPathExist(dirPath);
-
-        //time as file name
-        long timeStamp = System.currentTimeMillis();
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss");
-        String sd = sdf.format(new Date(timeStamp));
-        String fileName = sd + ".bmp";
-
-        File f = new File(dirPath, fileName);
-        if (f.exists()) {
-            if (!f.delete())
-                //Toast.makeText(getApplicationContext(), R.string.TextDelBmpFail, Toast.LENGTH_SHORT).show();
-                Log.i(TAG, "Del the same img file fail.");
-
-        }
-        try {
-            FileOutputStream out = new FileOutputStream(f);
-            int imgSize = w * h + 1078;
-
-            // Modify the length field of the bmp file header
-            bmp_head[2] = (byte) (imgSize & 0xff);
-            bmp_head[3] = (byte) ((imgSize >> 8) & 0xff);
-            bmp_head[4] = (byte) ((imgSize >> 16) & 0xff);
-            bmp_head[5] = (byte) ((imgSize >> 24) & 0xff);
-
-            // Modify the length and width fields of the bmp file header
-            bmp_head[18] = (byte) (w & 0xff);
-            bmp_head[19] = (byte) ((w >> 8) & 0xff);
-            bmp_head[20] = (byte) ((w >> 16) & 0xff);
-            bmp_head[21] = (byte) ((w >> 24) & 0xff);
-
-            bmp_head[22] = (byte) (h & 0xff);
-            bmp_head[23] = (byte) ((h >> 8) & 0xff);
-            bmp_head[24] = (byte) ((h >> 16) & 0xff);
-            bmp_head[25] = (byte) ((h >> 24) & 0xff);
-
-            out.write(bmp_head);    // write bmp header
-            out.write(bitmap);      // write bitmap content
-            out.close();
-            //Toast.makeText(getApplicationContext(), R.string.common_save_success, Toast.LENGTH_SHORT).show();
-            Log.i(TAG, "save success");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     *
-     */
-//    @OnClick(R.id.bnGetImg)
-    void GetImg() {
-        int[] wh = ds.nl_GetPicSize();
-        int w = wh[0];
-        int h = wh[1];
-        int imgSize = w * h;
-
-        if (imgSize != 0) {
-            byte[] imgBuf = new byte[imgSize];
-
-            pbUpdate.setVisibility(View.VISIBLE);
-            class GetImg implements Runnable {
-                public void run() {
-                    boolean ret = ds.nl_GetPicData(imgBuf, imgSize, new NLDeviceStream.NLTransImgListner() {
-                        @Override
-                        public void curProgress(int percent) {
-                            Log.d(TAG, "Img " + percent);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    // update
-                                    pbUpdate.setProgress(percent);
-                                    if (percent == 100) {
-                                        pbUpdate.setVisibility(View.GONE);
-                                        showText("GetImg:", "Get image succ!");
-                                    }
-                                }
-                            });
-                        }
-                    });
-                    if (ret) {
-                        saveImage(imgBuf, w, h);
-                    } else {
-                        Log.i(TAG, "Get img fail");
-                    }
-                }
-            }
-            Thread t = new Thread(new GetImg());
-            t.start();
-
         }
     }
 
@@ -877,35 +538,5 @@ public class MainActivity extends AppCompatActivity {
         builder.setPositiveButton("OK", null);
         builder.setCancelable(true);
         builder.create().show();
-    }
-
-    /**
-     * Read data from file
-     *
-     * @param firmware buffer for storing firmware
-     * @param file     open firmware file
-     */
-    private void readFile(byte[] firmware, File file) {
-        int len;
-        BufferedInputStream bis = null;
-
-        try {
-            bis = new BufferedInputStream(new FileInputStream(file));
-            len = bis.read(firmware);
-            if (len != firmware.length) {
-                Log.d(TAG, "Read length is wrong :" + len);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (bis != null) {
-                try {
-                    bis.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
     }
 }

@@ -36,6 +36,14 @@
                     android:layout_height="@dimen/dp_48"
                     android:text="@string/TextDecode" />
 
+                <Button
+                    android:id="@+id/bnLQScan"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dp_48"
+                    android:text="LQ Scan"
+                    android:background="#4CAF50"/>
+
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/dp_48"
