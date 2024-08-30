@@ -24,8 +24,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,19 +35,11 @@ import androidx.core.content.ContextCompat;
 
 import com.nlscan.nlsdk.NLDevice;
 import com.nlscan.nlsdk.NLDeviceStream;
-import com.nlscan.nlsdk.NLUartStream;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 
 public class LQscanActivity extends AppCompatActivity {
 
@@ -58,17 +48,17 @@ public class LQscanActivity extends AppCompatActivity {
     private int barcodeLen = 0;
     private int checkedItem = 0;
     private long lastNGTime = 0;
-    private long lastNonNGTime = 0;
+    private long lastGOODTime = 0;
     private  boolean CheckOK = false;
-    private int sequenceNumber1 = 1;
-    private int sequenceNumber2 = 1;
-    private int delta = 3600;
+    private int sequenceNumberMain = 1;
+    private int sequenceNumberLog = 1;
+    private int delta = 3000;
 
 
     private NLDeviceStream ds = new NLDevice(NLDeviceStream.DevClass.DEV_COMPOSITE);
 
-    private EditText lqetResult1;
-    private EditText lqetResult2;
+    private EditText lqetResultMain;
+    private EditText lqetResultLog;
 
     private TextView tvLogTitle;
     private Button btnToggleLog;
@@ -77,7 +67,7 @@ public class LQscanActivity extends AppCompatActivity {
     private TextView tvBaoOK, tvBaoNG, tvTotal;
     private Button btnStart, btnClear, btnExit;
     MediaPlayer mediaPlayerERR;
-    MediaPlayer mediaPlayerSUC;
+    MediaPlayer mediaPlayerSUCC;
     private boolean permissionsAreOk = false;
 
 
@@ -86,8 +76,8 @@ public class LQscanActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.lqscan);
 
-        lqetResult1 = findViewById(R.id.lqetResult1);
-        lqetResult2 = findViewById(R.id.lqetResult2);
+        lqetResultMain = findViewById(R.id.lqetResultMain);
+        lqetResultLog = findViewById(R.id.lqetResultLog);
         tvLogTitle = findViewById(R.id.tvLogTitle);
         btnToggleLog = findViewById(R.id.btnToggleLog);
 
@@ -99,12 +89,12 @@ public class LQscanActivity extends AppCompatActivity {
         btnClear = findViewById(R.id.btnClear);
         btnExit = findViewById(R.id.btnExit);
         mediaPlayerERR = MediaPlayer.create(this, R.raw.error1);
-        mediaPlayerSUC = MediaPlayer.create(this, R.raw.beep);
+        mediaPlayerSUCC = MediaPlayer.create(this, R.raw.beep);
         permissionsAreOk = checkPermissions();
         setTitle("LQ Scan");
 
         btnStart.setOnClickListener(view -> {
-            OnOpenCloseDevice();
+            OnConnectToDevice();
         });
 
         // Ẩn hiện cột Log
@@ -112,19 +102,19 @@ public class LQscanActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (isLogVisible) {
-                    lqetResult2.setVisibility(View.GONE);
+                    lqetResultLog.setVisibility(View.GONE);
                     tvLogTitle.setVisibility(View.GONE);
-                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) lqetResult1.getLayoutParams();
+                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) lqetResultMain.getLayoutParams();
                     params.weight = 2;
                     btnToggleLog.setText("HIỆN LOG");
-                    lqetResult1.setLayoutParams(params);
+                    lqetResultMain.setLayoutParams(params);
                 } else {
-                    lqetResult2.setVisibility(View.VISIBLE);
+                    lqetResultLog.setVisibility(View.VISIBLE);
                     tvLogTitle.setVisibility(View.VISIBLE);
-                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) lqetResult1.getLayoutParams();
+                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) lqetResultMain.getLayoutParams();
                     params.weight = 1;
                     btnToggleLog.setText("ẨN LOG");
-                    lqetResult1.setLayoutParams(params);
+                    lqetResultMain.setLayoutParams(params);
                 }
                 isLogVisible = !isLogVisible;
             }
@@ -164,13 +154,13 @@ public class LQscanActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 btnStart.setText("Bắt đầu");
-                lqetResult1.setText("");
-                lqetResult2.setText("");
+                lqetResultMain.setText("");
+                lqetResultLog.setText("");
                 tvBaoOK.setText("Số lượng bao OK: 0");
                 tvBaoNG.setText("Số lượng bao NG: 0");
                 tvTotal.setText("Tổng số lượng bao: 0");
-                sequenceNumber1 = 1;
-                sequenceNumber2 =1;
+                sequenceNumberMain = 1;
+                sequenceNumberLog =1;
             }
         });
 
@@ -231,18 +221,18 @@ public class LQscanActivity extends AppCompatActivity {
     /**
      * TABLE 1
      * */
-    void showText(String showtime, String text, int color) {
+    void showTextMain(String showtime, String text, int color) {
 
         String sequence;
-        if(sequenceNumber1<=9)
-            sequence = String.format("%3d.   ", sequenceNumber1++);
+        if(sequenceNumberMain<=9)
+            sequence = String.format("%3d.   ", sequenceNumberMain++);
         else
         {
-            if(sequenceNumber1<=99) {
-                sequence = String.format("%3d.  ", sequenceNumber1++);
+            if(sequenceNumberMain<=99) {
+                sequence = String.format("%3d.  ", sequenceNumberMain++);
             }
             else
-                sequence = String.format("%3d. ", sequenceNumber1++);
+                sequence = String.format("%3d. ", sequenceNumberMain++);
         }
 
         SpannableStringBuilder builder = new SpannableStringBuilder();
@@ -261,25 +251,25 @@ public class LQscanActivity extends AppCompatActivity {
 
         builder.setSpan(new android.text.style.ForegroundColorSpan(color), colorStart, builder.length(), 0);
 
-        lqetResult1.append(builder);
-        lqetResult1.append("\n");
+        lqetResultMain.append(builder);
+        lqetResultMain.append("\n");
     }
 
     /**
      * Table 2
      */
-    void showText2(String showtime, String text, int color) {
+    void showTextLOG(String showtime, String text, int color) {
 
         String sequence;
-        if(sequenceNumber2<=9)
-            sequence = String.format("%3d.   ", sequenceNumber2++);
+        if(sequenceNumberLog <=9)
+            sequence = String.format("%3d.   ", sequenceNumberLog++);
         else
         {
-            if(sequenceNumber2<=99) {
-                sequence = String.format("%3d.  ", sequenceNumber2++);
+            if(sequenceNumberLog <=99) {
+                sequence = String.format("%3d.  ", sequenceNumberLog++);
             }
             else
-                sequence = String.format("%3d. ", sequenceNumber2++);
+                sequence = String.format("%3d. ", sequenceNumberLog++);
         }
 
         SpannableStringBuilder builder = new SpannableStringBuilder();
@@ -296,11 +286,11 @@ public class LQscanActivity extends AppCompatActivity {
 
         builder.setSpan(new android.text.style.ForegroundColorSpan(color), colorStart, builder.length(), 0);
 
-        lqetResult2.append(builder);
-        lqetResult2.append("\n");
+        lqetResultLog.append(builder);
+        lqetResultLog.append("\n");
     }
 
-    void OnOpenCloseDevice() {
+    void OnConnectToDevice() {
          {
             btnStart.setText("Bắt đầu");
 
@@ -308,10 +298,9 @@ public class LQscanActivity extends AppCompatActivity {
 
                 @Override
                 public void actionUsbPlug(int event) {
-                    if (event == 1) {
+                    /*if (event == 1) {
                         ShowToast(getString(R.string.TextInfoPlugin));
-
-                    }
+                    }*/
                 }
 
                 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -325,54 +314,51 @@ public class LQscanActivity extends AppCompatActivity {
 
                         System.arraycopy(recvBuff, 0, barcodeBuff, 0, len);
                         //String prefix = String.format("scanBarCode len:%s data: ", barcodeLen);
-                        String str;
+                        String strRecv;
                         if (checkedItem == 1) {
-                            str = new String(barcodeBuff, 0, barcodeLen, StandardCharsets.UTF_8);
+                            strRecv = new String(barcodeBuff, 0, barcodeLen, StandardCharsets.UTF_8);
                         } else if (checkedItem == 2) {
-                            str = new String(barcodeBuff, 0, barcodeLen, Charset.forName("gb18030"));
+                            strRecv = new String(barcodeBuff, 0, barcodeLen, Charset.forName("gb18030"));
                         } else {
-                            str = new String(barcodeBuff, 0, barcodeLen);
+                            strRecv = new String(barcodeBuff, 0, barcodeLen);
                         }
-
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
 
                                 int baoOK = Integer.parseInt(tvBaoOK.getText().toString().replaceAll("\\D+", ""));
                                 int baoNG = Integer.parseInt(tvBaoNG.getText().toString().replaceAll("\\D+", ""));
                                 int total;
 
-                                    if (str.equals("NG")) {
-                                        showText2(showtime, str ,Color.RED);
-                                        if ((currentTime - lastNGTime > delta) && (currentTime - lastNonNGTime > delta)) {
+                                    if (strRecv.equals("NG")) {
+                                        showTextLOG(showtime, strRecv ,Color.RED);
+
+                                        /*  Nếu
+                                        * */
+                                        if ((currentTime - lastNGTime > delta) && (currentTime - lastGOODTime > delta)) {
                                             if (mediaPlayerERR != null) {
                                                 if (!mediaPlayerERR.isPlaying()) {
                                                     mediaPlayerERR.start();
                                                 }
                                             }
                                             baoNG++;
-                                            showText(showtime, str,Color.RED);
+                                            showTextMain(showtime, strRecv,Color.RED);
                                             lastNGTime = currentTime;
                                         }
                                     } else {
-                                        showText2(showtime,  str.substring(str.length() - 15),Color.BLACK);
-
-                                        lastNonNGTime = currentTime;
+                                        showTextLOG(showtime,  strRecv.substring(strRecv.length() - 15),Color.BLACK);
+                                        lastGOODTime = currentTime;
 
                                         if (mediaPlayerERR != null && mediaPlayerERR.isPlaying()) {
                                             mediaPlayerERR.pause();
                                             mediaPlayerERR.seekTo(0);
                                         }
 
-                                        if (mediaPlayerSUC != null) {
-                                            if (!mediaPlayerSUC.isPlaying()) {
-                                                mediaPlayerSUC.start();
+                                        if (mediaPlayerSUCC != null) {
+                                            if (!mediaPlayerSUCC.isPlaying()) {
+                                                mediaPlayerSUCC.start();
                                             }
                                         }
 
                                         baoOK++;
-                                        showText(showtime,  str.substring(str.length() - 15),Color.BLACK);
+                                        showTextMain(showtime,  strRecv.substring(strRecv.length() - 15),Color.BLACK);
                                     }
 
                                     total= baoOK + baoNG;
@@ -380,9 +366,6 @@ public class LQscanActivity extends AppCompatActivity {
                                     tvBaoOK.setText("Số lượng bao OK: " + baoOK);
                                     tvBaoNG.setText("Số lượng bao NG: " + baoNG);
                                     tvTotal.setText("Tổng số lượng bao: " + total);
-
-                            }
-                        });
 
                 }
 

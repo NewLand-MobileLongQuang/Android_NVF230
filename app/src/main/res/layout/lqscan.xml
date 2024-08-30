@@ -132,7 +132,7 @@
             android:orientation="horizontal">
 
             <EditText
-                android:id="@+id/lqetResult1"
+                android:id="@+id/lqetResultMain"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -144,7 +144,7 @@
                 android:singleLine="false" />
 
             <EditText
-                android:id="@+id/lqetResult2"
+                android:id="@+id/lqetResultLog"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
