@@ -19,6 +19,7 @@ import android.text.SpannableStringBuilder;
 import android.text.style.TabStopSpan;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -61,6 +62,7 @@ public class LQscanActivity extends AppCompatActivity {
     private  boolean CheckOK = false;
     private int sequenceNumber1 = 1;
     private int sequenceNumber2 = 1;
+    private int delta = 3600;
 
 
     private NLDeviceStream ds = new NLDevice(NLDeviceStream.DevClass.DEV_COMPOSITE);
@@ -127,6 +129,34 @@ public class LQscanActivity extends AppCompatActivity {
                 isLogVisible = !isLogVisible;
             }
         });
+
+        Button btnConfig = findViewById(R.id.btnconfig);
+
+        btnConfig.setOnClickListener(v -> {
+            LayoutInflater inflater = LayoutInflater.from(this);
+            View dialogView = inflater.inflate(R.layout.popupconfig, null);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setView(dialogView);
+            AlertDialog dialog = builder.create();
+
+            EditText etDelta = dialogView.findViewById(R.id.etDelta);
+            Button btnCancel = dialogView.findViewById(R.id.btnCancel);
+            Button btnOk = dialogView.findViewById(R.id.btnOk);
+
+            btnCancel.setOnClickListener(view -> dialog.dismiss());
+            btnOk.setOnClickListener(view -> {
+                String deltaInput = etDelta.getText().toString();
+                if (!deltaInput.isEmpty()) {
+                    delta = Integer.parseInt(deltaInput);
+                }
+                dialog.dismiss();
+
+            });
+
+            dialog.show();
+        });
+
 
 
         btnClear.setOnClickListener(new View.OnClickListener() {
@@ -274,15 +304,7 @@ public class LQscanActivity extends AppCompatActivity {
 
     void OnOpenCloseDevice() {
          {
-             //ds.nl_SendCommand("SCNENA1");
-             if(!CheckOK)
-             {
-                 btnStart.setText("Bắt đầu");
-                 CheckOK=true;
-             }
-             else
-                 btnStart.setText("Bắt đầu");
-
+            btnStart.setText("Bắt đầu");
             if (!ds.nl_OpenDevice(this, new NLDeviceStream.NLUsbListener() {
                 @Override
                 public void actionUsbPlug(int event) {
@@ -321,10 +343,9 @@ public class LQscanActivity extends AppCompatActivity {
 
                                 if(!str.equals("~<SOH>0000#SCNENA0")||!str.equals("~<SOH>0000#SCNENA1"))
                                 {
-
                                     if (str.equals("NG")) {
                                         showText2(showtime, "NG",Color.RED);
-                                        if ((currentTime - lastNGTime > 2900) && (currentTime - lastNonNGTime > 2900)) {
+                                        if ((currentTime - lastNGTime > delta) && (currentTime - lastNonNGTime > delta)) {
                                             if (mediaPlayerERR != null) {
                                                 if (!mediaPlayerERR.isPlaying()) {
                                                     mediaPlayerERR.start();
@@ -364,7 +385,6 @@ public class LQscanActivity extends AppCompatActivity {
 
             }))
             {
-
                 return;
             }
         }

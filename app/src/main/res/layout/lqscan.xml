@@ -7,8 +7,10 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+
+
         <LinearLayout
-            android:layout_width="565dp"
+            android:layout_width="665dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="20dp"
@@ -16,10 +18,19 @@
             android:orientation="horizontal">
 
             <Button
+                android:id="@+id/btnconfig"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#5782FF"
+                android:layout_marginEnd="16dp"
+                android:text="Cấu hình tham số" />
+
+            <Button
                 android:id="@+id/btnStart"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="#4CAF50"
+
                 android:text="Kết nối đầu quét" />
 
             <Button
