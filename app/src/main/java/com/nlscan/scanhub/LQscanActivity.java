@@ -162,7 +162,7 @@ public class LQscanActivity extends AppCompatActivity {
         btnClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //ds.nl_SendCommand("SCNENA0");
+
                 btnStart.setText("Bắt đầu");
                 lqetResult1.setText("");
                 lqetResult2.setText("");
@@ -214,12 +214,12 @@ public class LQscanActivity extends AppCompatActivity {
         switch (requestCode) {
             case 1:
             case 2:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {    // authorized
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     permissionsAreOk = checkPermissions();
                     if (permissionsAreOk) {
                         Log.i(TAG, "sdcard permission is ok.");
                     }
-                } else {                                                        //permission denied
+                } else {
                     finish();
                 }
                 return;
@@ -265,7 +265,6 @@ public class LQscanActivity extends AppCompatActivity {
         lqetResult1.append("\n");
     }
 
-
     /**
      * Table 2
      */
@@ -290,7 +289,6 @@ public class LQscanActivity extends AppCompatActivity {
         int tabStopPosition = 500;
         builder.setSpan(new TabStopSpan.Standard(tabStopPosition), 0, builder.length(), 0);
 
-
         builder.append(showtime + " - ");
 
         int colorStart = builder.length()-showtime.length()-3;
@@ -305,7 +303,9 @@ public class LQscanActivity extends AppCompatActivity {
     void OnOpenCloseDevice() {
          {
             btnStart.setText("Bắt đầu");
+
             if (!ds.nl_OpenDevice(this, new NLDeviceStream.NLUsbListener() {
+
                 @Override
                 public void actionUsbPlug(int event) {
                     if (event == 1) {
@@ -313,13 +313,18 @@ public class LQscanActivity extends AppCompatActivity {
 
                     }
                 }
+
                 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                 @Override
                 public void actionUsbRecv(byte[] recvBuff, int len) {
-                    barcodeLen = len;
-                    if (1==1) {
+                        barcodeLen = len;
+
+                        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS");
+                        String showtime = sdf.format(new Date());
+                        long currentTime = System.currentTimeMillis();
+
                         System.arraycopy(recvBuff, 0, barcodeBuff, 0, len);
-                        String prefix = String.format("scanBarCode len:%s data: ", barcodeLen);
+                        //String prefix = String.format("scanBarCode len:%s data: ", barcodeLen);
                         String str;
                         if (checkedItem == 1) {
                             str = new String(barcodeBuff, 0, barcodeLen, StandardCharsets.UTF_8);
@@ -328,23 +333,18 @@ public class LQscanActivity extends AppCompatActivity {
                         } else {
                             str = new String(barcodeBuff, 0, barcodeLen);
                         }
-                        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS");
-                        String showtime = sdf.format(new Date());
 
-                        long currentTime = System.currentTimeMillis();
 
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+
                                 int baoOK = Integer.parseInt(tvBaoOK.getText().toString().replaceAll("\\D+", ""));
                                 int baoNG = Integer.parseInt(tvBaoNG.getText().toString().replaceAll("\\D+", ""));
-                                int total = Integer.parseInt(tvTotal.getText().toString().replaceAll("\\D+", ""));
+                                int total;
 
-
-                                if(!str.equals("~<SOH>0000#SCNENA0")||!str.equals("~<SOH>0000#SCNENA1"))
-                                {
                                     if (str.equals("NG")) {
-                                        showText2(showtime, "NG",Color.RED);
+                                        showText2(showtime, str ,Color.RED);
                                         if ((currentTime - lastNGTime > delta) && (currentTime - lastNonNGTime > delta)) {
                                             if (mediaPlayerERR != null) {
                                                 if (!mediaPlayerERR.isPlaying()) {
@@ -352,13 +352,14 @@ public class LQscanActivity extends AppCompatActivity {
                                                 }
                                             }
                                             baoNG++;
-                                            showText(showtime, "NG",Color.RED);
-
+                                            showText(showtime, str,Color.RED);
                                             lastNGTime = currentTime;
                                         }
                                     } else {
                                         showText2(showtime,  str.substring(str.length() - 15),Color.BLACK);
+
                                         lastNonNGTime = currentTime;
+
                                         if (mediaPlayerERR != null && mediaPlayerERR.isPlaying()) {
                                             mediaPlayerERR.pause();
                                             mediaPlayerERR.seekTo(0);
@@ -369,18 +370,20 @@ public class LQscanActivity extends AppCompatActivity {
                                                 mediaPlayerSUC.start();
                                             }
                                         }
+
                                         baoOK++;
                                         showText(showtime,  str.substring(str.length() - 15),Color.BLACK);
                                     }
+
                                     total= baoOK + baoNG;
 
                                     tvBaoOK.setText("Số lượng bao OK: " + baoOK);
                                     tvBaoNG.setText("Số lượng bao NG: " + baoNG);
                                     tvTotal.setText("Tổng số lượng bao: " + total);
-                                }
+
                             }
                         });
-                    }
+
                 }
 
             }))
