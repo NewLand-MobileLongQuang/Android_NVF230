@@ -160,7 +160,7 @@ public class LQscanActivity extends AppCompatActivity {
                 tvBaoNG.setText("Số lượng bao NG: 0");
                 tvTotal.setText("Tổng số lượng bao: 0");
                 sequenceNumberMain = 1;
-                sequenceNumberLog =1;
+                sequenceNumberLog = 1;
             }
         });
 
@@ -323,50 +323,54 @@ public class LQscanActivity extends AppCompatActivity {
                             strRecv = new String(barcodeBuff, 0, barcodeLen);
                         }
 
-                                int baoOK = Integer.parseInt(tvBaoOK.getText().toString().replaceAll("\\D+", ""));
-                                int baoNG = Integer.parseInt(tvBaoNG.getText().toString().replaceAll("\\D+", ""));
-                                int total;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
 
-                                    if (strRecv.equals("NG")) {
-                                        showTextLOG(showtime, strRecv ,Color.RED);
+                            int baoOK = Integer.parseInt(tvBaoOK.getText().toString().replaceAll("\\D+", ""));
+                            int baoNG = Integer.parseInt(tvBaoNG.getText().toString().replaceAll("\\D+", ""));
+                            int total;
 
-                                        /*  Nếu
-                                        * */
-                                        if ((currentTime - lastNGTime > delta) && (currentTime - lastGOODTime > delta)) {
-                                            if (mediaPlayerERR != null) {
-                                                if (!mediaPlayerERR.isPlaying()) {
-                                                    mediaPlayerERR.start();
-                                                }
-                                            }
-                                            baoNG++;
-                                            showTextMain(showtime, strRecv,Color.RED);
-                                            lastNGTime = currentTime;
+                            if (strRecv.equals("NG")) {
+                                showTextLOG(showtime, strRecv ,Color.RED);
+                                if ((currentTime - lastNGTime > delta) && (currentTime - lastGOODTime > delta)) {
+                                    if (mediaPlayerERR != null) {
+                                        if (!mediaPlayerERR.isPlaying()) {
+                                            mediaPlayerERR.start();
                                         }
-                                    } else {
-                                        showTextLOG(showtime,  strRecv.substring(strRecv.length() - 15),Color.BLACK);
-                                        lastGOODTime = currentTime;
-
-                                        if (mediaPlayerERR != null && mediaPlayerERR.isPlaying()) {
-                                            mediaPlayerERR.pause();
-                                            mediaPlayerERR.seekTo(0);
-                                        }
-
-                                        if (mediaPlayerSUCC != null) {
-                                            if (!mediaPlayerSUCC.isPlaying()) {
-                                                mediaPlayerSUCC.start();
-                                            }
-                                        }
-
-                                        baoOK++;
-                                        showTextMain(showtime,  strRecv.substring(strRecv.length() - 15),Color.BLACK);
                                     }
+                                    baoNG++;
+                                    showTextMain(showtime, strRecv,Color.RED);
+                                    lastNGTime = currentTime;
+                                }
+                            } else {
+                                showTextLOG(showtime,  strRecv.substring(strRecv.length() - 15),Color.BLACK);
 
-                                    total= baoOK + baoNG;
+                                lastGOODTime = currentTime;
 
-                                    tvBaoOK.setText("Số lượng bao OK: " + baoOK);
-                                    tvBaoNG.setText("Số lượng bao NG: " + baoNG);
-                                    tvTotal.setText("Tổng số lượng bao: " + total);
+                                if (mediaPlayerERR != null && mediaPlayerERR.isPlaying()) {
+                                    mediaPlayerERR.pause();
+                                    mediaPlayerERR.seekTo(0);
+                                }
 
+                                if (mediaPlayerSUCC != null) {
+                                    if (!mediaPlayerSUCC.isPlaying()) {
+                                        mediaPlayerSUCC.start();
+                                    }
+                                }
+
+                                baoOK++;
+                                showTextMain(showtime,  strRecv.substring(strRecv.length() - 15),Color.BLACK);
+                            }
+
+                            total= baoOK + baoNG;
+
+                            tvBaoOK.setText("Số lượng bao OK: " + baoOK);
+                            tvBaoNG.setText("Số lượng bao NG: " + baoNG);
+                            tvTotal.setText("Tổng số lượng bao: " + total);
+
+                        }
+                    });
                 }
 
             }))
