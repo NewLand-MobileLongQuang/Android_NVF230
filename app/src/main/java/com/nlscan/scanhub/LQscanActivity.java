@@ -7,6 +7,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.media.MediaPlayer;
@@ -39,6 +40,7 @@ import com.nlscan.nlsdk.NLDeviceStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class LQscanActivity extends AppCompatActivity {
@@ -49,10 +51,15 @@ public class LQscanActivity extends AppCompatActivity {
     private int checkedItem = 0;
     private long lastNGTime = 0;
     private long lastGOODTime = 0;
+    private long lastWAITTime = 0;
+
+    //private LocalDateTime lastWAITTime = LocalDateTime.of(2000, 1, 1, 0, 0, 0, 0);
     private  boolean CheckOK = false;
     private int sequenceNumberMain = 1;
     private int sequenceNumberLog = 1;
-    private int delta = 3000;
+    private int delta = 3500;
+    private static final String PREFS_NAME = "ConfigPrefs";
+    private static final String DELTA_KEY = "delta_key";
 
 
     private NLDeviceStream ds = new NLDevice(NLDeviceStream.DevClass.DEV_COMPOSITE);
@@ -91,6 +98,7 @@ public class LQscanActivity extends AppCompatActivity {
         mediaPlayerERR = MediaPlayer.create(this, R.raw.error1);
         mediaPlayerSUCC = MediaPlayer.create(this, R.raw.beep);
         permissionsAreOk = checkPermissions();
+        OnConnectToDevice();
         setTitle("LQ Scan");
 
         btnStart.setOnClickListener(view -> {
@@ -120,6 +128,9 @@ public class LQscanActivity extends AppCompatActivity {
             }
         });
 
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        delta = sharedPreferences.getInt(DELTA_KEY, 3500);
+
         Button btnConfig = findViewById(R.id.btnconfig);
 
         btnConfig.setOnClickListener(v -> {
@@ -134,14 +145,21 @@ public class LQscanActivity extends AppCompatActivity {
             Button btnCancel = dialogView.findViewById(R.id.btnCancel);
             Button btnOk = dialogView.findViewById(R.id.btnOk);
 
+            etDelta.setText(String.valueOf(delta));
+
             btnCancel.setOnClickListener(view -> dialog.dismiss());
-            btnOk.setOnClickListener(view -> {
-                String deltaInput = etDelta.getText().toString();
-                if (!deltaInput.isEmpty()) {
-                    delta = Integer.parseInt(deltaInput);
+            btnOk.setOnClickListener(okView -> {
+                // Lưu giá trị vào SharedPreferences khi người dùng nhấn OK
+                String deltaStr = etDelta.getText().toString();
+                if (!deltaStr.isEmpty()) {
+                    delta = Integer.parseInt(deltaStr);
+
+                    // Lưu giá trị delta vào SharedPreferences
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putInt(DELTA_KEY, delta);
+                    editor.apply();
                 }
                 dialog.dismiss();
-
             });
 
             dialog.show();
@@ -152,7 +170,8 @@ public class LQscanActivity extends AppCompatActivity {
         btnClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                CheckOK=false;
+                ds.nl_SendCommand("SCNENA0");
                 btnStart.setText("Bắt đầu");
                 lqetResultMain.setText("");
                 lqetResultLog.setText("");
@@ -292,10 +311,19 @@ public class LQscanActivity extends AppCompatActivity {
 
     void OnConnectToDevice() {
          {
-            btnStart.setText("Bắt đầu");
+             Log.d("LONGLOGCHECK", "OnConnectToDevice: ==========> ");
+             if(!CheckOK){
+                 btnStart.setText("Bắt đầu");
+                 ds.nl_SendCommand("SCNENA0");
+                 CheckOK=true;
+             }
+             else{
+                 ds.nl_SendCommand("SCNENA1");
+                 btnStart.setText("Đang quét");
+             }
+
 
             if (!ds.nl_OpenDevice(this, new NLDeviceStream.NLUsbListener() {
-
                 @Override
                 public void actionUsbPlug(int event) {
                     /*if (event == 1) {
@@ -313,7 +341,7 @@ public class LQscanActivity extends AppCompatActivity {
                         long currentTime = System.currentTimeMillis();
 
                         System.arraycopy(recvBuff, 0, barcodeBuff, 0, len);
-                        //String prefix = String.format("scanBarCode len:%s data: ", barcodeLen);
+
                         String strRecv;
                         if (checkedItem == 1) {
                             strRecv = new String(barcodeBuff, 0, barcodeLen, StandardCharsets.UTF_8);
@@ -331,44 +359,67 @@ public class LQscanActivity extends AppCompatActivity {
                             int baoNG = Integer.parseInt(tvBaoNG.getText().toString().replaceAll("\\D+", ""));
                             int total;
 
-                            if (strRecv.equals("NG")) {
-                                showTextLOG(showtime, strRecv ,Color.RED);
-                                if ((currentTime - lastNGTime > delta) && (currentTime - lastGOODTime > delta)) {
-                                    if (mediaPlayerERR != null) {
-                                        if (!mediaPlayerERR.isPlaying()) {
-                                            mediaPlayerERR.start();
+                            if(strRecv.contains("SCNENA0"))
+                            {
+                                showTextLOG(showtime, "Dừng quét" ,Color.BLACK);
+                            }
+                            else
+                            {
+                                if(strRecv.contains("SCNENA1"))
+                                {
+                                    showTextLOG(showtime, "Bắt đầu quét" ,Color.BLACK);
+                                }
+                                else
+                                {
+                                    if (strRecv.equals("NG")) {
+                                        showTextLOG(showtime, strRecv ,Color.RED);
+                                        if ((currentTime - lastNGTime > delta) && (currentTime - lastGOODTime > delta)&&(currentTime - lastWAITTime > delta)) {
+                                            if (mediaPlayerERR != null) {
+                                                if (!mediaPlayerERR.isPlaying()) {
+                                                    mediaPlayerERR.start();
+                                                }
+                                            }
+                                            baoNG++;
+                                            showTextMain(showtime, strRecv,Color.RED);
+                                            lastNGTime = currentTime;
                                         }
                                     }
-                                    baoNG++;
-                                    showTextMain(showtime, strRecv,Color.RED);
-                                    lastNGTime = currentTime;
-                                }
-                            } else {
-                                showTextLOG(showtime,  strRecv.substring(strRecv.length() - 15),Color.BLACK);
+                                    else
+                                    {
+                                        if (strRecv.contains("ETEM_WAIT"))
+                                        {
+                                            showTextLOG(showtime, strRecv.substring(strRecv.length() - 10) ,Color.BLACK);
+                                            lastWAITTime = currentTime;
+                                        }
+                                        else
+                                        {
+                                            showTextLOG(showtime,  strRecv.substring(strRecv.length() - 15),Color.BLACK);
 
-                                lastGOODTime = currentTime;
+                                            lastGOODTime = currentTime;
 
-                                if (mediaPlayerERR != null && mediaPlayerERR.isPlaying()) {
-                                    mediaPlayerERR.pause();
-                                    mediaPlayerERR.seekTo(0);
-                                }
+                                            if (mediaPlayerERR != null && mediaPlayerERR.isPlaying())
+                                            {
+                                                mediaPlayerERR.pause();
+                                                mediaPlayerERR.seekTo(0);
+                                            }
+                                            if (mediaPlayerSUCC != null) {
+                                                if (!mediaPlayerSUCC.isPlaying()) {
+                                                    mediaPlayerSUCC.start();
+                                                }
+                                            }
 
-                                if (mediaPlayerSUCC != null) {
-                                    if (!mediaPlayerSUCC.isPlaying()) {
-                                        mediaPlayerSUCC.start();
+                                            baoOK++;
+                                            showTextMain(showtime,  strRecv.substring(strRecv.length() - 15),Color.BLACK);
+                                        }
                                     }
                                 }
 
-                                baoOK++;
-                                showTextMain(showtime,  strRecv.substring(strRecv.length() - 15),Color.BLACK);
-                            }
+                                    total= baoOK + baoNG;
 
-                            total= baoOK + baoNG;
-
-                            tvBaoOK.setText("Số lượng bao OK: " + baoOK);
-                            tvBaoNG.setText("Số lượng bao NG: " + baoNG);
-                            tvTotal.setText("Tổng số lượng bao: " + total);
-
+                                    tvBaoOK.setText("Số lượng bao OK: " + baoOK);
+                                    tvBaoNG.setText("Số lượng bao NG: " + baoNG);
+                                    tvTotal.setText("Tổng số lượng bao: " + total);
+                                }
                         }
                     });
                 }
@@ -381,15 +432,4 @@ public class LQscanActivity extends AppCompatActivity {
 
     }
 
-    private void ShowToast(CharSequence toastText) {
-        @SuppressLint("InflateParams") View toastRoot = getLayoutInflater().inflate(R.layout.toast, null);
-        TextView message = toastRoot.findViewById(R.id.toast_message);
-        message.setText(toastText);
-
-        Toast toastStart = new Toast(this);
-        toastStart.setGravity(Gravity.CENTER, 0, 10);
-        toastStart.setDuration(Toast.LENGTH_SHORT);
-        toastStart.setView(toastRoot);
-        toastStart.show();
-    }
 }

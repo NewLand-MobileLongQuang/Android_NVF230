@@ -378,10 +378,10 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void actionUsbPlug(int event) {
                     if (event == 1) {
-                        MainActivity.this.ShowToast(getString(R.string.TextInfoPlugin));
+                        //MainActivity.this.ShowToast(getString(R.string.TextInfoPlugin));
                     } else {
                         ds.nl_CloseDevice();
-                        MainActivity.this.ShowToast(getString(R.string.TextInfoPlugout));
+                        //MainActivity.this.ShowToast(getString(R.string.TextInfoPlugout));
                         observable.subscribeOn(Schedulers.newThread())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(usbPlugObserver);
