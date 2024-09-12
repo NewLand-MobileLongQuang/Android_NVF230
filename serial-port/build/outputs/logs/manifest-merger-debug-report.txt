@@ -1,25 +1,25 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml:1:1-72
-INJECTED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml:1:1-72
-INJECTED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml:1:1-72
+ADDED from C:\RFID\stc_nvf230\Android_NVF230\serial-port\src\main\AndroidManifest.xml:1:1-72
+INJECTED from C:\RFID\stc_nvf230\Android_NVF230\serial-port\src\main\AndroidManifest.xml:1:1-72
+INJECTED from C:\RFID\stc_nvf230\Android_NVF230\serial-port\src\main\AndroidManifest.xml:1:1-72
 	package
-		INJECTED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml
-		ADDED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml:1:1-72
-		INJECTED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml
+		INJECTED from C:\RFID\stc_nvf230\Android_NVF230\serial-port\src\main\AndroidManifest.xml
+		ADDED from C:\RFID\stc_nvf230\Android_NVF230\serial-port\src\main\AndroidManifest.xml:1:1-72
+		INJECTED from C:\RFID\stc_nvf230\Android_NVF230\serial-port\src\main\AndroidManifest.xml
 	xmlns:android
-		ADDED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml:1:11-69
+		ADDED from C:\RFID\stc_nvf230\Android_NVF230\serial-port\src\main\AndroidManifest.xml:1:11-69
 uses-sdk
-INJECTED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml reason: use-sdk injection requested
-INJECTED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml
-INJECTED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml
-INJECTED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml
-INJECTED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml
+INJECTED from C:\RFID\stc_nvf230\Android_NVF230\serial-port\src\main\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from C:\RFID\stc_nvf230\Android_NVF230\serial-port\src\main\AndroidManifest.xml
+INJECTED from C:\RFID\stc_nvf230\Android_NVF230\serial-port\src\main\AndroidManifest.xml
+INJECTED from C:\RFID\stc_nvf230\Android_NVF230\serial-port\src\main\AndroidManifest.xml
+INJECTED from C:\RFID\stc_nvf230\Android_NVF230\serial-port\src\main\AndroidManifest.xml
 	android:targetSdkVersion
-		INJECTED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml
-		ADDED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml
-		INJECTED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml
+		INJECTED from C:\RFID\stc_nvf230\Android_NVF230\serial-port\src\main\AndroidManifest.xml
+		ADDED from C:\RFID\stc_nvf230\Android_NVF230\serial-port\src\main\AndroidManifest.xml
+		INJECTED from C:\RFID\stc_nvf230\Android_NVF230\serial-port\src\main\AndroidManifest.xml
 	android:minSdkVersion
-		INJECTED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml
-		ADDED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml
-		INJECTED from /Users/leson/Downloads/N-ScanHubForAndroid_V1.0.2 2/serial-port/src/main/AndroidManifest.xml
+		INJECTED from C:\RFID\stc_nvf230\Android_NVF230\serial-port\src\main\AndroidManifest.xml
+		ADDED from C:\RFID\stc_nvf230\Android_NVF230\serial-port\src\main\AndroidManifest.xml
+		INJECTED from C:\RFID\stc_nvf230\Android_NVF230\serial-port\src\main\AndroidManifest.xml
