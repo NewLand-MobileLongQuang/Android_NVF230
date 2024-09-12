@@ -55,11 +55,15 @@ public class LQscanActivity extends AppCompatActivity {
 
     //private LocalDateTime lastWAITTime = LocalDateTime.of(2000, 1, 1, 0, 0, 0, 0);
     private  boolean CheckOK = false;
-    private int sequenceNumberMain = 1;
-    private int sequenceNumberLog = 1;
+    private int sequenceNumberMain =0;
+    private int sequenceNumberLog =0;
     private int delta = 3500;
     private static final String PREFS_NAME = "ConfigPrefs";
     private static final String DELTA_KEY = "delta_key";
+    private static final String PREFS_NAME_Main = "MyAppPreferences";
+    private static final String DELTA_KEY_Main = "main_key";
+    private static final String PREFS_NAME_Log = "logPreferences";
+    private static final String DELTA_KEY_Log = "log_key";
 
 
     private NLDeviceStream ds = new NLDevice(NLDeviceStream.DevClass.DEV_COMPOSITE);
@@ -242,25 +246,29 @@ public class LQscanActivity extends AppCompatActivity {
      * */
     void showTextMain(String showtime, String text, int color) {
 
+        SharedPreferences sharedPreferencesdeltamain = getSharedPreferences(PREFS_NAME_Main, MODE_PRIVATE);
+        sequenceNumberMain = sharedPreferencesdeltamain.getInt(DELTA_KEY_Main, 0);
+
+        sequenceNumberMain++;
+        SharedPreferences.Editor editor = sharedPreferencesdeltamain.edit();
+        editor.putInt(DELTA_KEY_Main, sequenceNumberMain);
+        editor.apply();
+
         String sequence;
         if(sequenceNumberMain<=9)
-            sequence = String.format("%3d.   ", sequenceNumberMain++);
+            sequence = String.format("%3d.   ", sequenceNumberMain);
         else
         {
             if(sequenceNumberMain<=99) {
-                sequence = String.format("%3d.  ", sequenceNumberMain++);
+                sequence = String.format("%3d.  ", sequenceNumberMain);
             }
             else
-                sequence = String.format("%3d. ", sequenceNumberMain++);
+                sequence = String.format("%3d. ", sequenceNumberMain);
         }
 
         SpannableStringBuilder builder = new SpannableStringBuilder();
 
         builder.append(sequence);
-
-        int tabStopPosition = 500;
-        builder.setSpan(new TabStopSpan.Standard(tabStopPosition), 0, builder.length(), 0);
-
 
         builder.append(showtime + " - ");
 
@@ -279,24 +287,29 @@ public class LQscanActivity extends AppCompatActivity {
      */
     void showTextLOG(String showtime, String text, int color) {
 
+        SharedPreferences sharedPreferencesdeltaLog = getSharedPreferences(PREFS_NAME_Log, MODE_PRIVATE);
+        sequenceNumberLog = sharedPreferencesdeltaLog.getInt(DELTA_KEY_Log, 0);
+
+        sequenceNumberLog++;
+        SharedPreferences.Editor editor = sharedPreferencesdeltaLog.edit();
+        editor.putInt(DELTA_KEY_Main, sequenceNumberLog);
+        editor.apply();
+
         String sequence;
         if(sequenceNumberLog <=9)
-            sequence = String.format("%3d.   ", sequenceNumberLog++);
+            sequence = String.format("%3d.   ", sequenceNumberLog);
         else
         {
             if(sequenceNumberLog <=99) {
-                sequence = String.format("%3d.  ", sequenceNumberLog++);
+                sequence = String.format("%3d.  ", sequenceNumberLog);
             }
             else
-                sequence = String.format("%3d. ", sequenceNumberLog++);
+                sequence = String.format("%3d. ", sequenceNumberLog);
         }
 
         SpannableStringBuilder builder = new SpannableStringBuilder();
 
         builder.append(sequence);
-
-        int tabStopPosition = 500;
-        builder.setSpan(new TabStopSpan.Standard(tabStopPosition), 0, builder.length(), 0);
 
         builder.append(showtime + " - ");
 

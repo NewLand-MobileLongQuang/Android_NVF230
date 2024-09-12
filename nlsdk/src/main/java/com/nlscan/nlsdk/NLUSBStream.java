@@ -79,7 +79,12 @@ abstract class NLUSBStream implements NLCommStream{
         IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
         filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
         filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
-        context.registerReceiver(mUsbPermissionActionReceiver, filter);
+        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU) {
+            context.registerReceiver(mUsbPermissionActionReceiver, filter, Context.RECEIVER_EXPORTED);
+        }
+        else {
+            context.registerReceiver(mUsbPermissionActionReceiver, filter);
+        }
 //        PendingIntent mPermissionIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), 0);
         PendingIntent mPermissionIntent;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
