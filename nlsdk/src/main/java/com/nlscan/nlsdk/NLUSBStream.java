@@ -24,8 +24,10 @@ import android.os.Process;
 
 /**
  * This abstract class encapsulates the basic operation functions of USB devices,
- * such as USB device enumeration opening, closing, listening and unplugging, and USB permission operations.
- * The enumeration of USB devices here is only for the VID and PID specified by Newland's hardware decoding products.
+ * such as USB device enumeration opening, closing, listening and unplugging, and USB permission
+ * operations.
+ * The enumeration of USB devices here is only for the VID and PID specified by Newland's
+ * hardware decoding products.
  * If the VID and PID are customized, please modify the relevant code.
  */
 abstract class NLUSBStream implements NLCommStream{
@@ -80,27 +82,28 @@ abstract class NLUSBStream implements NLCommStream{
         filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
         filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
         if(Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU) {
-            context.registerReceiver(mUsbPermissionActionReceiver, filter, Context.RECEIVER_EXPORTED);
+            context.registerReceiver(mUsbPermissionActionReceiver, filter,
+                    Context.RECEIVER_EXPORTED);
         }
         else {
             context.registerReceiver(mUsbPermissionActionReceiver, filter);
         }
-//        PendingIntent mPermissionIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), 0);
+//        PendingIntent mPermissionIntent = PendingIntent.getBroadcast(context, 0, new Intent
+//        (ACTION_USB_PERMISSION), 0);
         PendingIntent mPermissionIntent;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             mPermissionIntent = PendingIntent.getBroadcast(
-                context,
-                0,
-                new Intent(ACTION_USB_PERMISSION),
-                PendingIntent.FLAG_IMMUTABLE
+                    context,
+                    0,
+                    new Intent(ACTION_USB_PERMISSION),
+                    PendingIntent.FLAG_IMMUTABLE
             );
         } else {
             mPermissionIntent = PendingIntent.getBroadcast(
-                context,
-                0,
-                new Intent(ACTION_USB_PERMISSION),
-                PendingIntent.FLAG_IMMUTABLE
-            );
+                    context,
+                    0,
+                    new Intent(ACTION_USB_PERMISSION),
+                    PendingIntent.FLAG_IMMUTABLE);
         }
 
         if(usbManager == null) {
@@ -152,8 +155,10 @@ abstract class NLUSBStream implements NLCommStream{
 
     /**
      *  Use asynchronous IO to receive and buffer the request to receive IN packets.
-     *  The purpose is to solve the packet loss caused by system scheduling when using bulkTransfer blocking calls.
-     *  The independent receiving thread will wait for the request of the IN packet until the data is received or the request is canceled.
+     *  The purpose is to solve the packet loss caused by system scheduling when using
+     *  bulkTransfer blocking calls.
+     *  The independent receiving thread will wait for the request of the IN packet until the
+     *  data is received or the request is canceled.
      *  Receive requests are controlled by mStop.
      */
     private void ReadRequest(){
@@ -277,7 +282,8 @@ abstract class NLUSBStream implements NLCommStream{
         final int request = 0x09;
         final int value   = (3 << 8) | 0xFE;
         final int index   = dataInterface.getId();
-        final int ret = connection.controlTransfer(type, request, value, index, cmdFeature, 2, timeout);
+        final int ret = connection.controlTransfer(type, request, value, index, cmdFeature, 2,
+                timeout);
         return ret == 0 || ret == 2;
     }
 

@@ -195,6 +195,12 @@ public class LQscanActivity extends AppCompatActivity {
         });
     }
 
+    public void onClick(View view) {
+        // Create an Intent to start LQscanActivity
+        Intent intent = new Intent(LQscanActivity.this, MainActivity.class);
+        startActivity(intent);
+    }
+
     private boolean checkPermissions() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
 
@@ -339,9 +345,12 @@ public class LQscanActivity extends AppCompatActivity {
             if (!ds.nl_OpenDevice(this, new NLDeviceStream.NLUsbListener() {
                 @Override
                 public void actionUsbPlug(int event) {
-                    /*if (event == 1) {
-                        ShowToast(getString(R.string.TextInfoPlugin));
-                    }*/
+                    if (event == 1) {
+                        ShowToast("Device Plugged");
+                    }
+                    else {
+                        ShowToast("Device UnPlugged");
+                    }
                 }
 
                 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -443,6 +452,17 @@ public class LQscanActivity extends AppCompatActivity {
             }
         }
 
+    }
+    private void ShowToast(CharSequence toastText) {
+        @SuppressLint("InflateParams") View toastRoot = getLayoutInflater().inflate(R.layout.toast, null);
+        TextView message = toastRoot.findViewById(R.id.toast_message);
+        message.setText(toastText);
+
+        Toast toastStart = new Toast(this);
+        toastStart.setGravity(Gravity.CENTER, 0, 10);
+        toastStart.setDuration(Toast.LENGTH_SHORT);
+        toastStart.setView(toastRoot);
+        toastStart.show();
     }
 
 }
