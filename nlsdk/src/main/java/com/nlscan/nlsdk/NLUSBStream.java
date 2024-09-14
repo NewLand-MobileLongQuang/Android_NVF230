@@ -51,21 +51,54 @@ abstract class NLUSBStream implements NLCommStream{
 
     private final BroadcastReceiver mUsbPermissionActionReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-            assert device != null;
-            if(!device.equals(usbDevice))
-                return;
-            if(UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action))
-            {
-                usbListener.actionUsbPlug(1);
-                plugFlag = true;
+            try {
+                String action = intent.getAction();
+                UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+
+                if (device == null) {
+                    Log.e("TrungLQ", "No device found.");
+                    return;
+                } else {
+                    Log.d("TrungLQ", "Device found.");
+                }
+
+                // Kiểm tra nếu action là USB_PERMISSION
+                if ("com.android.example.USB_PERMISSION".equals(action)) {
+                    synchronized (this) {
+                        if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
+                            // Quyền đã được cấp
+                            Log.d("TrungLQ", "Permission granted.");
+                            // Thực hiện thao tác với USB device
+                        } else {
+                            Log.e("TrungLQ", "Permission denied.");
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                Log.e("TrungLQ", "Error receiving broadcast: " + e.getMessage());
+                e.printStackTrace();
             }
-            else if(UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action))
-            {
-                usbListener.actionUsbPlug(0);
-                plugFlag = false;
-            }
+//            String action = intent.getAction();
+//            UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+//            if(device == null) {
+//                Log.e("TrungLQ", "No device found.");
+//            }
+//            else {
+//                Log.d("TrungLQ", "Device found.");
+//            }
+//            //assert device != null;
+//            if(!device.equals(usbDevice))
+//                return;
+//            if(UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action))
+//            {
+//                usbListener.actionUsbPlug(1);
+//                plugFlag = true;
+//            }
+//            else if(UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action))
+//            {
+//                usbListener.actionUsbPlug(0);
+//                plugFlag = false;
+//            }
         }
     };
 
