@@ -6,6 +6,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -64,6 +65,8 @@ public class LQscanActivity extends AppCompatActivity {
     private static final String DELTA_KEY_Main = "main_key";
     private static final String PREFS_NAME_Log = "logPreferences";
     private static final String DELTA_KEY_Log = "log_key";
+    private static final String NG_KEY_Log = "NG_key";
+    private static final String GOOD_KEY_Log = "GD_key";
 
 
     private NLDeviceStream ds = new NLDevice(NLDeviceStream.DevClass.DEV_COMPOSITE);
@@ -80,6 +83,9 @@ public class LQscanActivity extends AppCompatActivity {
     MediaPlayer mediaPlayerERR;
     MediaPlayer mediaPlayerSUCC;
     private boolean permissionsAreOk = false;
+    int baoOK = 0;
+    int baoNG = 0;
+    int total;
 
 
     @Override
@@ -95,6 +101,16 @@ public class LQscanActivity extends AppCompatActivity {
         tvBaoOK = findViewById(R.id.tvBaoOK);
         tvBaoNG = findViewById(R.id.tvBaoNG);
         tvTotal = findViewById(R.id.tvTotal);
+
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME_Main, MODE_PRIVATE);
+         baoOK = sharedPreferences.getInt("BAO_OK", 0);   // Giá trị mặc định là 0 nếu chưa có
+         baoNG = sharedPreferences.getInt("BAO_NG", 0);   // Giá trị mặc định là 0 nếu chưa có
+         total = sharedPreferences.getInt("TOTAL", 0);    // Giá trị mặc định là 0 nếu chưa có
+
+        // Cập nhật TextView với dữ liệu đã lưu
+        tvBaoOK.setText("Số lượng bao OK: " + baoOK);
+        tvBaoNG.setText("Số lượng bao NG: " + baoNG);
+        tvTotal.setText("Tổng số lượng bao: " + total);
 
         btnStart = findViewById(R.id.btnStart);
         btnClear = findViewById(R.id.btnClear);
@@ -132,7 +148,7 @@ public class LQscanActivity extends AppCompatActivity {
             }
         });
 
-        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        //SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         delta = sharedPreferences.getInt(DELTA_KEY, 3500);
 
         Button btnConfig = findViewById(R.id.btnconfig);
@@ -175,24 +191,80 @@ public class LQscanActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 CheckOK=false;
-                ds.nl_SendCommand("SCNENA0");
-                btnStart.setText("Bắt đầu");
+                //ds.nl_SendCommand("SCNENA0");
+                //btnStart.setText("Bắt đầu");
                 lqetResultMain.setText("");
                 lqetResultLog.setText("");
                 tvBaoOK.setText("Số lượng bao OK: 0");
                 tvBaoNG.setText("Số lượng bao NG: 0");
                 tvTotal.setText("Tổng số lượng bao: 0");
-                sequenceNumberMain = 1;
-                sequenceNumberLog = 1;
+                sequenceNumberMain = 0;
+                sequenceNumberLog = 0;
+                baoOK = 0;
+                baoNG = 0;
+                total = 0;
+
+                SharedPreferences sharedPreferencesdeltamain = getSharedPreferences(PREFS_NAME_Main, MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferencesdeltamain.edit();
+                editor.putInt(DELTA_KEY_Main, sequenceNumberMain);
+                editor.putInt(DELTA_KEY_Log, sequenceNumberLog);
+                editor.putInt("BAO_NG", baoNG);
+                editor.putInt("BAO_OK", baoOK);
+                editor.putInt("TOTAL", total);
+
+
+                editor.apply();
             }
         });
 
         btnExit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                // Tạo AlertDialog để xác nhận
+                new AlertDialog.Builder(LQscanActivity.this)
+                        .setTitle("Xác nhận thoát")
+                        .setMessage("Dữ liệu quét sẽ mất, bạn có chắc chắn muốn thoát?")
+                        .setPositiveButton("Có", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Thực hiện các hành động khi người dùng chọn "Có"
+                                CheckOK = false;
+                                //ds.nl_SendCommand("SCNENA0");
+                                //btnStart.setText("Bắt đầu");
+                                lqetResultMain.setText("");
+                                lqetResultLog.setText("");
+                                tvBaoOK.setText("Số lượng bao OK: 0");
+                                tvBaoNG.setText("Số lượng bao NG: 0");
+                                tvTotal.setText("Tổng số lượng bao: 0");
+                                sequenceNumberMain = 0;
+                                sequenceNumberLog = 0;
+                                baoOK = 0;
+                                baoNG = 0;
+                                total = 0;
+
+                                SharedPreferences sharedPreferencesdeltamain = getSharedPreferences(PREFS_NAME_Main, MODE_PRIVATE);
+                                SharedPreferences.Editor editor = sharedPreferencesdeltamain.edit();
+                                editor.putInt(DELTA_KEY_Main, sequenceNumberMain);
+                                editor.putInt(DELTA_KEY_Log, sequenceNumberLog);
+                                editor.putInt("BAO_NG", baoNG);
+                                editor.putInt("BAO_OK", baoOK);
+                                editor.putInt("TOTAL", total);
+
+                                editor.apply();
+                                finish(); // Thoát khỏi Activity
+                            }
+                        })
+                        .setNegativeButton("Không", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick( DialogInterface dialog, int which) {
+                                // Đóng hộp thoại mà không làm gì
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
             }
         });
+
     }
 
     public void onClick(View view) {
@@ -293,12 +365,12 @@ public class LQscanActivity extends AppCompatActivity {
      */
     void showTextLOG(String showtime, String text, int color) {
 
-        SharedPreferences sharedPreferencesdeltaLog = getSharedPreferences(PREFS_NAME_Log, MODE_PRIVATE);
-        sequenceNumberLog = sharedPreferencesdeltaLog.getInt(DELTA_KEY_Log, 0);
+        SharedPreferences sharedPreferencesdeltalog = getSharedPreferences(PREFS_NAME_Main, MODE_PRIVATE);
+        sequenceNumberLog = sharedPreferencesdeltalog.getInt(DELTA_KEY_Log, 0);
 
         sequenceNumberLog++;
-        SharedPreferences.Editor editor = sharedPreferencesdeltaLog.edit();
-        editor.putInt(DELTA_KEY_Main, sequenceNumberLog);
+        SharedPreferences.Editor editor = sharedPreferencesdeltalog.edit();
+        editor.putInt(DELTA_KEY_Log, sequenceNumberLog);
         editor.apply();
 
         String sequence;
@@ -336,9 +408,11 @@ public class LQscanActivity extends AppCompatActivity {
                  ds.nl_SendCommand("SCNENA0");
                  CheckOK=true;
              }
+
              else{
                  ds.nl_SendCommand("SCNENA1");
                  btnStart.setText("Đang quét");
+                 CheckOK=false;
              }
 
 
@@ -375,11 +449,10 @@ public class LQscanActivity extends AppCompatActivity {
 
                     runOnUiThread(new Runnable() {
                         @Override
-                        public void run() {
 
-                            int baoOK = Integer.parseInt(tvBaoOK.getText().toString().replaceAll("\\D+", ""));
-                            int baoNG = Integer.parseInt(tvBaoNG.getText().toString().replaceAll("\\D+", ""));
-                            int total;
+                        public void run() {
+                            baoNG = Integer.parseInt(tvBaoNG.getText().toString().replaceAll("\\D+", ""));
+                            baoOK = Integer.parseInt(tvBaoOK.getText().toString().replaceAll("\\D+", ""));
 
                             if(strRecv.contains("SCNENA0"))
                             {
@@ -401,7 +474,15 @@ public class LQscanActivity extends AppCompatActivity {
                                                     mediaPlayerERR.start();
                                                 }
                                             }
+                                            SharedPreferences sharedPreferencesdeltamain = getSharedPreferences(PREFS_NAME_Main, MODE_PRIVATE);
+                                            baoNG = sharedPreferencesdeltamain.getInt(NG_KEY_Log, 0);
+
                                             baoNG++;
+                                            SharedPreferences.Editor editor = sharedPreferencesdeltamain.edit();
+                                            editor.putInt(NG_KEY_Log, baoNG);
+                                            editor.apply();
+
+
                                             showTextMain(showtime, strRecv,Color.RED);
                                             lastNGTime = currentTime;
                                         }
@@ -429,8 +510,15 @@ public class LQscanActivity extends AppCompatActivity {
                                                     mediaPlayerSUCC.start();
                                                 }
                                             }
+                                            SharedPreferences sharedPreferencesdeltamain = getSharedPreferences(PREFS_NAME_Main, MODE_PRIVATE);
+                                            baoOK = sharedPreferencesdeltamain.getInt(GOOD_KEY_Log, 0);
 
                                             baoOK++;
+                                            SharedPreferences.Editor editor = sharedPreferencesdeltamain.edit();
+                                            editor.putInt(GOOD_KEY_Log, baoOK);
+                                            editor.apply();
+
+
                                             showTextMain(showtime,  strRecv.substring(strRecv.length() - 15),Color.BLACK);
                                         }
                                     }
@@ -441,6 +529,13 @@ public class LQscanActivity extends AppCompatActivity {
                                     tvBaoOK.setText("Số lượng bao OK: " + baoOK);
                                     tvBaoNG.setText("Số lượng bao NG: " + baoNG);
                                     tvTotal.setText("Tổng số lượng bao: " + total);
+
+                                    SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME_Main, MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.putInt("BAO_OK", baoOK);
+                                    editor.putInt("BAO_NG", baoNG);
+                                    editor.putInt("TOTAL", total);
+                                    editor.apply();
                                 }
                         }
                     });
